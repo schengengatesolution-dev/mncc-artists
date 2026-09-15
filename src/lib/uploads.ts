@@ -59,7 +59,7 @@ function assertDataUrlSize(file: File, name: string, buf: Buffer, folder: string
 /**
  * Upload to Vercel Blob when BLOB_READ_WRITE_TOKEN is set.
  * Otherwise try local public/uploads (dev). On read-only FS (Vercel serverless)
- * or when local write fails with EROFS/EACCES, store a data: URL for MVP sizes.
+ * or when Blob/local write fails, store a data: URL for MVP sizes.
  */
 export async function uploadFile(
   file: File,
@@ -70,11 +70,19 @@ export async function uploadFile(
   const buf = Buffer.from(await file.arrayBuffer());
 
   if (token) {
-    const blob = await put(`${folder}/${name}`, file, {
-      access: "public",
-      token,
-    });
-    return blob.url;
+    try {
+      const blob = await put(`${folder}/${name}`, buf, {
+        access: "public",
+        token,
+        contentType: file.type || "application/octet-stream",
+      });
+      return blob.url;
+    } catch (blobErr) {
+      // Prefer MVP data-URL for small files over hard failure if Blob misconfigured
+      console.error("uploadFile Blob put failed; trying data-URL fallback", blobErr);
+      assertDataUrlSize(file, name, buf, folder);
+      return toDataUrl(file, buf);
+    }
   }
 
   try {

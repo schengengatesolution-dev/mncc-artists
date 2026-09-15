@@ -137,11 +137,13 @@ export async function POST(req: Request) {
       }
       const detail =
         uploadErr instanceof Error ? uploadErr.message : "unknown upload error";
+      // Short non-secret hint so clients see real cause (not fake Network error)
+      const hint = detail.slice(0, 180);
       return NextResponse.json(
         {
           error:
-            "Upload failed. Use smaller photos (≤1.5MB each) and resume (≤4MB), or set BLOB_READ_WRITE_TOKEN.",
-          detail: process.env.NODE_ENV === "development" ? detail : undefined,
+            "Upload failed. Use smaller photos (≤1.5MB each) and resume (≤4MB), or set BLOB_READ_WRITE_TOKEN." +
+            (hint ? ` (${hint})` : ""),
         },
         { status: 500 }
       );
