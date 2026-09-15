@@ -14,6 +14,10 @@ export default function RegisterPage() {
       <p className="mt-2 text-theater-muted">
         Уран бүтээлчийн бүртгэл — fill once; MNCC builds your shareable artist profile.
       </p>
+      <p className="mt-3 text-sm text-theater-cream/80">
+        Videos: Google Drive original files only (Anyone with the link → Viewer). CV: no personal contact — clients reach MNCC only.
+        / Видео: зөвхөн Google Drive эх файл. CV: хувийн холбоо барих мэдээлэлгүй — үйлчлүүлэгч Шинэ цирк төвтэй холбогдоно.
+      </p>
       <div className="mt-8">
         <RegisterForm />
       </div>

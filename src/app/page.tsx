@@ -63,7 +63,7 @@ export default function HomePage() {
           {
             en: "One registration",
             mn: "Нэг бүртгэл",
-            body: "Bio, videos, photos, and CV in one shareable artist profile.",
+            body: "Bio, Google Drive videos, photos, and CV in one shareable artist profile.",
           },
           {
             en: "Festival & casting ready",

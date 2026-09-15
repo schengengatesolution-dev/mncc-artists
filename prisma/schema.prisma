@@ -24,7 +24,9 @@ model Artist {
   videoUrls          String
   videoFileUrls      String   @default("[]")
   photoUrls          String
+  photosDriveUrl     String?
   resumeUrl          String?
+  resumeDriveUrl     String?
   yearsExperience    Int?
   availabilityWindow String?
   preferredRegions   String   @default("[]")

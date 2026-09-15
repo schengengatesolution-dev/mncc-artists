@@ -26,7 +26,9 @@ export type ArtistDossierData = {
   videoUrls: string;
   videoFileUrls: string;
   photoUrls: string;
+  photosDriveUrl?: string | null;
   resumeUrl: string | null;
+  resumeDriveUrl?: string | null;
   yearsExperience: number | null;
   availabilityWindow: string | null;
   preferredRegions: string;
@@ -42,6 +44,11 @@ type Props = {
   showRegisteredBanner?: boolean;
 };
 
+const driveBtn =
+  "inline-flex items-center rounded-full bg-theater-gold px-4 py-2 text-sm font-semibold text-theater-bg hover:bg-theater-gold-soft transition";
+const secondaryBtn =
+  "inline-flex items-center rounded-full border border-theater-border px-4 py-2 text-sm text-theater-gold-soft hover:border-theater-gold transition";
+
 export function ArtistDossier({
   artist,
   showPrivateContact = false,
@@ -54,6 +61,9 @@ export function ArtistDossier({
   const photos = parseJsonArray(artist.photoUrls);
   const regions = parseJsonArray(artist.preferredRegions);
   const headshot = photos[0];
+  const photosDriveUrl = artist.photosDriveUrl || null;
+  const resumeDriveUrl = artist.resumeDriveUrl || null;
+  const hasResume = !!(artist.resumeUrl || resumeDriveUrl);
 
   return (
     <article className="dossier-print mx-auto max-w-3xl px-4 py-10">
@@ -155,70 +165,114 @@ export function ArtistDossier({
       </section>
 
       {/* 4. Videos */}
-      <section className="dossier-section mt-10">
-        <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-          Videos
-        </h2>
-        <ul className="mt-3 space-y-2">
-          {videos.map((url) => (
-            <li key={url}>
+      {(videos.length > 0 || videoFiles.length > 0) && (
+        <section className="dossier-section mt-10">
+          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
+            Videos
+          </h2>
+          <div className="mt-4 flex flex-col gap-3 no-print">
+            {videos.map((url, i) => (
               <a
+                key={url}
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-theater-gold-soft hover:underline break-all"
+                className={driveBtn}
               >
-                {url}
+                {i === 0
+                  ? "Open video on Google Drive"
+                  : `Open video on Google Drive (${i + 1})`}
               </a>
-            </li>
-          ))}
-          {videoFiles.map((url) => (
-            <li key={url}>
+            ))}
+            {videoFiles.map((url) => (
               <a
+                key={url}
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-theater-gold-soft hover:underline break-all"
+                className={secondaryBtn}
               >
-                Video file: {url}
+                Download video file
               </a>
-            </li>
-          ))}
-        </ul>
-      </section>
+            ))}
+          </div>
+          <ul className="mt-3 space-y-1 text-xs text-theater-muted break-all print:block">
+            {videos.map((url) => (
+              <li key={`print-${url}`}>{url}</li>
+            ))}
+            {videoFiles.map((url) => (
+              <li key={`print-file-${url}`}>{url}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* 5. Photos */}
-      {photos.length > 0 && (
+      {(photos.length > 0 || photosDriveUrl) && (
         <section className="dossier-section mt-10">
           <h2 className="text-sm uppercase tracking-wider text-theater-gold">
             Photos
           </h2>
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {photos.map((url) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={url}
-                src={url}
-                alt=""
-                className="aspect-square w-full rounded-xl object-cover border border-theater-border"
-              />
-            ))}
-          </div>
+          {photosDriveUrl && (
+            <div className="mt-4 no-print">
+              <a
+                href={photosDriveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={driveBtn}
+              >
+                Open photos folder
+              </a>
+              <p className="mt-2 text-xs text-theater-muted break-all">
+                {photosDriveUrl}
+              </p>
+            </div>
+          )}
+          {photos.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {photos.map((url) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={url}
+                  src={url}
+                  alt=""
+                  className="aspect-square w-full rounded-xl object-cover border border-theater-border"
+                />
+              ))}
+            </div>
+          )}
         </section>
       )}
 
       {/* Resume / CV */}
-      {artist.resumeUrl && (
+      {hasResume && (
         <section className="dossier-section mt-10">
           <h2 className="text-sm uppercase tracking-wider text-theater-gold">
             Resume / CV / Намтар
           </h2>
           <p className="mt-2 text-sm text-theater-muted">
-            Download the artist&apos;s curriculum vitae for festivals and casting.
+            Contact via New Circus Center only. / Холбоо барих: зөвхөн Шинэ цирк төв.
           </p>
-          <div className="mt-4">
-            <ResumeDownloadButton url={artist.resumeUrl} />
+          <div className="mt-4 flex flex-wrap gap-3 no-print">
+            {resumeDriveUrl && (
+              <a
+                href={resumeDriveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={driveBtn}
+              >
+                Open CV on Drive
+              </a>
+            )}
+            {artist.resumeUrl && (
+              <ResumeDownloadButton url={artist.resumeUrl} />
+            )}
           </div>
+          {resumeDriveUrl && (
+            <p className="mt-2 text-xs text-theater-muted break-all print:block">
+              {resumeDriveUrl}
+            </p>
+          )}
         </section>
       )}
 
@@ -313,6 +367,18 @@ export function ArtistDossier({
                 />
               </p>
             )}
+            {resumeDriveUrl && (
+              <p className="pt-1">
+                <a
+                  href={resumeDriveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-theater-gold-soft hover:underline"
+                >
+                  CV on Drive
+                </a>
+              </p>
+            )}
           </div>
         )}
       </section>
@@ -336,4 +402,3 @@ export function ArtistDossier({
     </article>
   );
 }
-

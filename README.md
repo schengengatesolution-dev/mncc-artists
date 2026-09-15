@@ -89,7 +89,7 @@ npx prisma db push && npm run seed
 3. Vercel injects `BLOB_READ_WRITE_TOKEN` automatically — **do not paste tokens into git or chat**.
 4. Redeploy. After that, larger durable uploads work via `@vercel/blob`.
 
-Until Blob is connected, artists should compress photos to ≤1.5MB (the register form auto-compresses images toward ≤1.2MB JPEG) and prefer YouTube/Vimeo links instead of video file uploads.
+Videos must be Google Drive original-file share links (Anyone with the link → Viewer) — YouTube/Vimeo are rejected. Prefer Drive folder links for photos and CV; optional small file uploads remain as fallback. CVs must not include personal contact (clients contact MNCC only).
 
 5. Deploy. Then from a machine with the same `DATABASE_URL`:
    ```bash
@@ -103,6 +103,12 @@ Until Blob is connected, artists should compress photos to ≤1.5MB (the registe
 
 Official circular cyan/red/blue **New Circus** logo: `public/logo.png` (HD: `public/logo-hd.png`). Do not substitute BLACK.png / mncc.jpg / N*.jpg as the brand mark.
 
+
+## Materials rules
+
+- **Videos:** Google Drive original files only (`drive.google.com` / `docs.google.com`). YouTube, youtu.be, and Vimeo are rejected (client + server). Share as **Anyone with the link → Viewer**.
+- **Photos / CV:** Drive links preferred (required if not uploading). Small uploads remain optional fallback.
+- **CV content:** No personal phone, email, WeChat, social, address, or personal links. Artists confirm via `cvNoContact` checkbox. Clients contact MNCC only.
 
 ## Contact
 

@@ -7,10 +7,16 @@ import {
   BIO_EN_MAX,
   PREFERRED_REGIONS,
 } from "@/lib/constants";
+import {
+  DRIVE_SHARE_GUIDE_EN,
+  DRIVE_SHARE_GUIDE_MN,
+  isBlockedVideoHost,
+  isGoogleDriveUrl,
+  validateGoogleDriveUrl,
+} from "@/lib/drive";
 
 const PHOTO_MAX = 1.5 * 1024 * 1024; // 1.5MB
 const RESUME_MAX = 4 * 1024 * 1024; // 4MB
-const VIDEO_FILE_MAX = 1.5 * 1024 * 1024; // 1.5MB
 const COMPRESS_TARGET = 1.2 * 1024 * 1024; // 1.2MB JPEG target
 const MAX_PHOTOS = 8;
 
@@ -89,13 +95,57 @@ async function compressImageToJpeg(
   }
 }
 
-function validateClientFiles(
+function collectVideoUrls(raw: FormData): string[] {
+  const urls: string[] = [];
+  for (let i = 1; i <= 6; i++) {
+    const v = String(raw.get(`videoUrl${i}`) || "").trim();
+    if (v) urls.push(v);
+  }
+  return urls;
+}
+
+function validateClient(
+  videoUrls: string[],
+  photosDriveUrl: string,
+  resumeDriveUrl: string,
   photos: File[],
-  resume: File | null,
-  videoFiles: File[]
+  resume: File | null
 ): string | null {
-  if (photos.length === 0) {
-    return "Upload at least one photo. / Хамгийн багадаа 1 зураг оруулна уу.";
+  if (videoUrls.length === 0) {
+    return (
+      "At least one Google Drive video link is required. / " +
+      "Google Drive видео холбоос заавал оруулна уу."
+    );
+  }
+  for (const url of videoUrls) {
+    if (isBlockedVideoHost(url)) {
+      return (
+        "YouTube and Vimeo are not accepted. Paste a Google Drive link to the original video file. / " +
+        "YouTube, Vimeo хүлээн авахгүй — эх видео файлын Google Drive холбоос оруулна уу."
+      );
+    }
+    if (!isGoogleDriveUrl(url)) {
+      return (
+        "Video links must be Google Drive share links (drive.google.com / docs.google.com). / " +
+        "Видео холбоос Google Drive байх ёстой."
+      );
+    }
+  }
+
+  if (photosDriveUrl) {
+    const err = validateGoogleDriveUrl(photosDriveUrl, "Photos Drive link");
+    if (err) return err;
+  }
+  if (resumeDriveUrl) {
+    const err = validateGoogleDriveUrl(resumeDriveUrl, "Resume Drive link");
+    if (err) return err;
+  }
+
+  if (!photosDriveUrl && photos.length === 0) {
+    return (
+      "Add a Google Drive photos folder link (preferred), or upload at least one photo. / " +
+      "Зургийн Google Drive фолдер холбоос (илүү дээр) эсвэл зураг оруулна уу."
+    );
   }
   if (photos.length > MAX_PHOTOS) {
     return `Maximum ${MAX_PHOTOS} photos. / Хамгийн ихдээ ${MAX_PHOTOS} зураг.`;
@@ -108,22 +158,18 @@ function validateClientFiles(
       );
     }
   }
-  if (!resume || resume.size === 0) {
-    return "Resume/CV is required. / CV заавал оруулна уу.";
+
+  if (!resumeDriveUrl && (!resume || resume.size === 0)) {
+    return (
+      "Add a Google Drive resume/CV link (preferred), or upload a resume file. / " +
+      "CV-ийн Google Drive холбоос (илүү дээр) эсвэл файл оруулна уу."
+    );
   }
-  if (resume.size > RESUME_MAX) {
+  if (resume && resume.size > RESUME_MAX) {
     return (
       `Resume is too large (${formatMb(resume.size)}). Max ${formatMb(RESUME_MAX)}. ` +
       `/ CV хэт том байна. Хамгийн ихдээ ${formatMb(RESUME_MAX)}.`
     );
-  }
-  for (const f of videoFiles) {
-    if (f.size > VIDEO_FILE_MAX) {
-      return (
-        `Video file "${f.name}" is too large (${formatMb(f.size)}). Max ${formatMb(VIDEO_FILE_MAX)}. Prefer a YouTube/Vimeo link. ` +
-        `/ Видео файл хэт том. YouTube/Vimeo холбоос илүү тохиромжтой.`
-      );
-    }
   }
   return null;
 }
@@ -158,14 +204,16 @@ export function RegisterForm() {
           (raw.get("resume") as File).size > 0 &&
           (raw.get("resume") as File)) ||
         null;
-      const videoList = (raw.getAll("videoFiles") as File[]).filter(
-        (f) => f instanceof File && f.size > 0
-      );
+      const videoUrls = collectVideoUrls(raw);
+      const photosDriveUrl = String(raw.get("photosDriveUrl") || "").trim();
+      const resumeDriveUrl = String(raw.get("resumeDriveUrl") || "").trim();
 
-      const validationError = validateClientFiles(
+      const validationError = validateClient(
+        videoUrls,
+        photosDriveUrl,
+        resumeDriveUrl,
         photoList,
-        resumeFile,
-        videoList
+        resumeFile
       );
       if (validationError) {
         setError(validationError);
@@ -173,17 +221,15 @@ export function RegisterForm() {
         return;
       }
 
-      // Compress photos client-side when possible (JPEG ≤1.2MB)
       const compressedPhotos: File[] = [];
       for (const photo of photoList) {
         compressedPhotos.push(await compressImageToJpeg(photo));
       }
-      // Re-check after compression (edge case: still over)
       for (const f of compressedPhotos) {
         if (f.size > PHOTO_MAX) {
           setError(
             `Photo "${f.name}" is still too large after compression (${formatMb(f.size)}). Max ${formatMb(PHOTO_MAX)}. ` +
-              `/ Шахасны дараа ч зураг хэт том байна. Жижиг зураг сонгоно уу.`
+              `/ Шахасны дараа ч зураг хэт том байна. Google Drive фолдер холбоос ашиглана уу.`
           );
           setBusy(false);
           return;
@@ -192,7 +238,7 @@ export function RegisterForm() {
 
       const fd = new FormData();
       Array.from(raw.entries()).forEach(([key, value]) => {
-        if (key === "photos" || key === "videoFiles" || key === "resume") return;
+        if (key === "photos" || key === "resume") return;
         if (key === "actTypes" || key === "preferredRegions") return;
         fd.append(key, value);
       });
@@ -200,7 +246,6 @@ export function RegisterForm() {
       regions.forEach((r) => fd.append("preferredRegions", r));
       compressedPhotos.forEach((f) => fd.append("photos", f));
       if (resumeFile) fd.append("resume", resumeFile);
-      videoList.forEach((f) => fd.append("videoFiles", f));
 
       const res = await fetch("/api/register", { method: "POST", body: fd });
 
@@ -227,7 +272,11 @@ export function RegisterForm() {
           (bodyText && bodyText.slice(0, 200)) ||
           `Request failed (HTTP ${res.status})`;
         setError(
-          `${msg}${res.status === 413 ? " — payload too large; use smaller photos or YouTube/Vimeo links." : ""}`
+          `${msg}${
+            res.status === 413
+              ? " — payload too large; use Google Drive links for photos/CV instead of large uploads."
+              : ""
+          }`
         );
         setBusy(false);
         return;
@@ -343,31 +392,66 @@ export function RegisterForm() {
           />
         </div>
 
-        <div>
+        {/* Google Drive video — required */}
+        <div className="rounded-xl border border-theater-gold/40 bg-theater-gold/5 p-4 space-y-3">
           <label className={label} htmlFor="videoUrl1">
-            Primary video URL (YouTube / Vimeo) *
+            Primary video — Google Drive original file * / Видео (Google Drive эх файл) *
           </label>
+          <p className="text-xs text-theater-cream/90">
+            Videos must be Google Drive original files only — not YouTube, Vimeo, or other sites.
+            / Зөвхөн Google Drive эх файл — YouTube, Vimeo болон бусад сайт хүлээн авахгүй.
+          </p>
+          <ol className="list-decimal pl-5 space-y-1 text-xs text-theater-muted">
+            {DRIVE_SHARE_GUIDE_EN.map((step, i) => (
+              <li key={step}>
+                <span className="text-theater-cream/85">{step}</span>
+                <span className="block text-theater-muted">{DRIVE_SHARE_GUIDE_MN[i]}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="text-xs text-amber-200/90">
+            Warning: if the link is Restricted, clients cannot open it. /
+            Анхааруулга: Restricted бол үйлчлүүлэгч нээж чадахгүй.
+          </p>
           <input
             id="videoUrl1"
             name="videoUrl1"
             type="url"
             required
-            placeholder="https://youtube.com/..."
+            placeholder="https://drive.google.com/file/d/…"
+            className={field}
+          />
+        </div>
+
+        <div>
+          <label className={label} htmlFor="photosDriveUrl">
+            Photos folder — Google Drive * (preferred) / Зургийн фолдер (Google Drive)
+          </label>
+          <p className="mt-0.5 text-xs text-theater-muted">
+            Share a Drive folder with photos · Anyone with the link → Viewer ·
+            Фолдерыг Anyone with the link → Viewer болгоно уу
+          </p>
+          <input
+            id="photosDriveUrl"
+            name="photosDriveUrl"
+            type="url"
+            placeholder="https://drive.google.com/drive/folders/…"
             className={field}
           />
         </div>
 
         <div className="rounded-lg border border-theater-gold/30 bg-theater-gold/5 px-3 py-2 text-xs text-theater-cream/90">
-          Large phone photos often fail — compress or resize first / Утасны том
-          зураг алдаа гаргаж болно — жижигрүүлээд оруулна уу.
+          Prefer Google Drive for large packs. Optional uploads below if you also want a headshot on the dossier. /
+          Том багцыг Drive-аар илгээнэ үү. Доорх upload нь нэмэлт (dossier дээрх зураг).
         </div>
 
         <div>
           <label className={label} htmlFor="photos">
-            Photos *
+            Photos upload (optional fallback)
           </label>
           <p className="mt-0.5 text-xs text-theater-muted">
-            max 1.5MB each · up to 8 · Зураг: нэг бүр 1.5MB хүртэл (хамгийн ихдээ 8)
+            max 1.5MB each · up to 8 · required only if no Drive folder link ·
+            Зураг: нэг бүр 1.5MB хүртэл (Drive холбоос байхгүй бол заавал)
           </p>
           <input
             id="photos"
@@ -375,7 +459,6 @@ export function RegisterForm() {
             type="file"
             accept="image/*"
             multiple
-            required
             className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold file:px-3 file:py-1 file:text-theater-bg`}
           />
           <p className="mt-1 text-xs text-theater-muted">
@@ -383,21 +466,68 @@ export function RegisterForm() {
           </p>
         </div>
 
-        <div>
-          <label className={label} htmlFor="resume">
-            Resume / CV *
+        <div className="rounded-xl border border-theater-border bg-theater-elevated/40 p-4 space-y-3">
+          <label className={label} htmlFor="resumeDriveUrl">
+            Resume / CV — Google Drive * (preferred) / Намтар (Google Drive)
           </label>
           <p className="mt-0.5 text-xs text-theater-muted">
-            max 4MB · PDF/DOC · Намтар: 4MB хүртэл
+            Share the CV file · Anyone with the link → Viewer
           </p>
+          <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-3 py-2 text-xs text-amber-100/95 space-y-1">
+            <p>
+              <strong>CV must NOT include personal contact</strong> — no phone, email, WeChat,
+              social media, address, or personal links. Allowed: name, talent/act, experience,
+              festivals, awards.
+            </p>
+            <p>
+              <strong>CV-д хувийн холбоо барих мэдээлэл оруулахгүй</strong> — утас, имэйл, WeChat,
+              сошиал, хаяг, хувийн холбоос байж болохгүй. Зөвшөөрөгдөх: нэр, урлаг/акт, туршлага,
+              фестиваль, шагнал.
+            </p>
+            <p className="text-theater-cream/80">
+              Clients contact New Circus Center only (mongolcircus@gmail.com / site contact). /
+              Үйлчлүүлэгч зөвхөн Шинэ цирк төвтэй холбогдоно.
+            </p>
+          </div>
           <input
-            id="resume"
-            name="resume"
-            type="file"
-            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            required
-            className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold file:px-3 file:py-1 file:text-theater-bg`}
+            id="resumeDriveUrl"
+            name="resumeDriveUrl"
+            type="url"
+            placeholder="https://drive.google.com/file/d/…"
+            className={field}
           />
+
+          <div>
+            <label className={label} htmlFor="resume">
+              Resume / CV upload (optional fallback)
+            </label>
+            <p className="mt-0.5 text-xs text-theater-muted">
+              max 4MB · PDF/DOC · required only if no Drive link · Намтар: 4MB хүртэл
+            </p>
+            <input
+              id="resume"
+              name="resume"
+              type="file"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold file:px-3 file:py-1 file:text-theater-bg`}
+            />
+          </div>
+
+          <label className="flex items-start gap-3 text-sm text-theater-cream/90">
+            <input
+              type="checkbox"
+              name="cvNoContact"
+              value="yes"
+              required
+              className="mt-1 accent-theater-gold"
+            />
+            <span>
+              I confirm my CV/resume has <strong>no personal contact</strong> (no phone, email,
+              WeChat, social, address, or personal links). Clients contact MNCC only. /
+              Миний CV-д <strong>хувийн холбоо барих мэдээлэл байхгүй</strong> гэдгийг баталж байна.
+              Үйлчлүүлэгч зөвхөн Шинэ цирк төвтэй холбогдоно. *
+            </span>
+          </label>
         </div>
 
         <label className="flex items-start gap-3 text-sm text-theater-cream/90">
@@ -429,34 +559,20 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Extra video links (≤5) — preferred</p>
+          <p className={label}>Extra Google Drive video links (≤5)</p>
+          <p className="text-xs text-theater-muted">
+            Same rule: Drive original files only — no YouTube/Vimeo. /
+            Зөвхөн Google Drive — YouTube/Vimeo биш.
+          </p>
           {[2, 3, 4, 5, 6].map((n) => (
             <input
               key={n}
               name={`videoUrl${n}`}
               type="url"
-              placeholder={`Video URL ${n - 1}`}
+              placeholder={`https://drive.google.com/… (${n - 1})`}
               className={field}
             />
           ))}
-        </div>
-
-        <div>
-          <label className={label} htmlFor="videoFiles">
-            Extra video file uploads (optional)
-          </label>
-          <p className="mt-0.5 text-xs text-theater-muted">
-            max 1.5MB each — prefer YouTube/Vimeo link · Видео файл: 1.5MB
-            (YouTube/Vimeo холбоос илүү дээр)
-          </p>
-          <input
-            id="videoFiles"
-            name="videoFiles"
-            type="file"
-            accept="video/*"
-            multiple
-            className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold/80 file:px-3 file:py-1 file:text-theater-bg`}
-          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

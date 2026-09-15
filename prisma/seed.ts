@@ -25,13 +25,15 @@ async function main() {
       bioMn:
         "Монголын Нугаралтын уран бүтээлч. Шинэ Циркийн Төв (MNCC)-ийн уран бүтээлчдийн нөөцөд бүртгэгдсэн.",
       videoUrls: JSON.stringify([
-        "https://youtu.be/rNOW8ODHGuI",
-        "https://www.youtube.com/watch?v=E7UE2yEMmyI",
-        "https://youtu.be/hCy2App3fnU",
+        "https://drive.google.com/file/d/demo-video-placeholder/view?usp=sharing",
       ]),
       videoFileUrls: JSON.stringify([]),
       photoUrls: JSON.stringify(["/demo-headshot.jpg", "/mncc-poster.jpg"]),
+      photosDriveUrl:
+        "https://drive.google.com/drive/folders/demo-photos-placeholder?usp=sharing",
       resumeUrl: null,
+      resumeDriveUrl:
+        "https://drive.google.com/file/d/demo-cv-placeholder/view?usp=sharing",
       yearsExperience: 8,
       availabilityWindow: "Open — contact MNCC",
       preferredRegions: JSON.stringify(["Europe", "Asia", "Cruise", "Anywhere"]),

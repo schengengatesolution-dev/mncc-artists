@@ -4,23 +4,14 @@ import { uploadFile, UploadError } from "@/lib/uploads";
 import { toJsonArray } from "@/lib/json";
 import { uniqueSlug } from "@/lib/slug";
 import { BIO_EN_MAX } from "@/lib/constants";
+import {
+  isBlockedVideoHost,
+  isGoogleDriveUrl,
+  validateGoogleDriveUrl,
+} from "@/lib/drive";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
-
-function isVideoUrl(url: string): boolean {
-  try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, "");
-    return (
-      host.includes("youtube.com") ||
-      host === "youtu.be" ||
-      host.includes("vimeo.com")
-    );
-  } catch {
-    return false;
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -35,6 +26,7 @@ export async function POST(req: Request) {
     const bioEn = String(fd.get("bioEn") || "").trim();
     const bioMn = String(fd.get("bioMn") || "").trim() || null;
     const consent = fd.get("consent") === "yes";
+    const cvNoContact = fd.get("cvNoContact") === "yes";
     const actTypes = fd.getAll("actTypes").map(String).filter(Boolean);
     const preferredRegions = fd
       .getAll("preferredRegions")
@@ -46,6 +38,11 @@ export async function POST(req: Request) {
       const v = String(fd.get(`videoUrl${i}`) || "").trim();
       if (v) videoUrls.push(v);
     }
+
+    const photosDriveUrl =
+      String(fd.get("photosDriveUrl") || "").trim() || null;
+    const resumeDriveUrl =
+      String(fd.get("resumeDriveUrl") || "").trim() || null;
 
     const yearsRaw = String(fd.get("yearsExperience") || "").trim();
     const yearsExperience = yearsRaw ? parseInt(yearsRaw, 10) : null;
@@ -74,9 +71,55 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    if (videoUrls.length === 0 || !isVideoUrl(videoUrls[0])) {
+    if (videoUrls.length === 0) {
       return NextResponse.json(
-        { error: "Provide at least one YouTube or Vimeo URL." },
+        {
+          error:
+            "Provide at least one Google Drive link to your original video file. / Google Drive видео холбоос заавал.",
+        },
+        { status: 400 }
+      );
+    }
+    for (const url of videoUrls) {
+      if (isBlockedVideoHost(url)) {
+        return NextResponse.json(
+          {
+            error:
+              "YouTube and Vimeo links are not accepted. Use Google Drive original file links only. / YouTube, Vimeo хүлээн авахгүй — зөвхөн Google Drive.",
+          },
+          { status: 400 }
+        );
+      }
+      if (!isGoogleDriveUrl(url)) {
+        return NextResponse.json(
+          {
+            error:
+              "Video URLs must be Google Drive share links (drive.google.com or docs.google.com). / Видео холбоос Google Drive байх ёстой.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (photosDriveUrl) {
+      const err = validateGoogleDriveUrl(photosDriveUrl, "Photos Drive link");
+      if (err) {
+        return NextResponse.json({ error: err }, { status: 400 });
+      }
+    }
+    if (resumeDriveUrl) {
+      const err = validateGoogleDriveUrl(resumeDriveUrl, "Resume Drive link");
+      if (err) {
+        return NextResponse.json({ error: err }, { status: 400 });
+      }
+    }
+
+    if (!cvNoContact) {
+      return NextResponse.json(
+        {
+          error:
+            "Confirm that your CV has no personal contact details. / CV-д хувийн холбоо барих мэдээлэл байхгүй гэдгийг батална уу.",
+        },
         { status: 400 }
       );
     }
@@ -90,42 +133,43 @@ export async function POST(req: Request) {
     const photoFiles = fd
       .getAll("photos")
       .filter((f): f is File => f instanceof File && f.size > 0);
-    if (photoFiles.length === 0) {
-      return NextResponse.json(
-        { error: "Upload at least one photo." },
-        { status: 400 }
-      );
-    }
     if (photoFiles.length > 8) {
       return NextResponse.json(
         { error: "Maximum 8 photos." },
         { status: 400 }
       );
     }
+    if (!photosDriveUrl && photoFiles.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Provide a Google Drive photos folder link, or upload at least one photo. / Зургийн Google Drive фолдер холбоос эсвэл зураг оруулна уу.",
+        },
+        { status: 400 }
+      );
+    }
 
     const resume = fd.get("resume");
-    if (!(resume instanceof File) || resume.size === 0) {
+    const hasResumeFile = resume instanceof File && resume.size > 0;
+    if (!resumeDriveUrl && !hasResumeFile) {
       return NextResponse.json(
-        { error: "Resume/CV is required." },
+        {
+          error:
+            "Provide a Google Drive resume/CV link, or upload a resume file. / CV-ийн Google Drive холбоос эсвэл файл оруулна уу.",
+        },
         { status: 400 }
       );
     }
 
     let photoUrls: string[];
-    let resumeUrl: string;
-    let videoFileUrls: string[];
+    let resumeUrl: string | null = null;
     try {
       photoUrls = [];
       for (const file of photoFiles.slice(0, 8)) {
         photoUrls.push(await uploadFile(file, "photos"));
       }
-      resumeUrl = await uploadFile(resume, "resumes");
-      const videoFileInputs = fd
-        .getAll("videoFiles")
-        .filter((f): f is File => f instanceof File && f.size > 0);
-      videoFileUrls = [];
-      for (const file of videoFileInputs.slice(0, 5)) {
-        videoFileUrls.push(await uploadFile(file, "videos"));
+      if (hasResumeFile) {
+        resumeUrl = await uploadFile(resume as File, "resumes");
       }
     } catch (uploadErr) {
       console.error("register upload error", uploadErr);
@@ -137,12 +181,11 @@ export async function POST(req: Request) {
       }
       const detail =
         uploadErr instanceof Error ? uploadErr.message : "unknown upload error";
-      // Short non-secret hint so clients see real cause (not fake Network error)
       const hint = detail.slice(0, 180);
       return NextResponse.json(
         {
           error:
-            "Upload failed. Use smaller photos (≤1.5MB each) and resume (≤4MB), or set BLOB_READ_WRITE_TOKEN." +
+            "Upload failed. Prefer Google Drive links for photos/CV, or use smaller files (photos ≤1.5MB, resume ≤4MB), or set BLOB_READ_WRITE_TOKEN." +
             (hint ? ` (${hint})` : ""),
         },
         { status: 500 }
@@ -168,9 +211,11 @@ export async function POST(req: Request) {
         bioEn,
         bioMn,
         videoUrls: toJsonArray(videoUrls.slice(0, 6)),
-        videoFileUrls: toJsonArray(videoFileUrls),
+        videoFileUrls: toJsonArray([]),
         photoUrls: toJsonArray(photoUrls),
+        photosDriveUrl,
         resumeUrl,
+        resumeDriveUrl,
         yearsExperience:
           yearsExperience !== null && !Number.isNaN(yearsExperience)
             ? yearsExperience

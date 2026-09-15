@@ -20,10 +20,12 @@ model Artist {
   actTitle           String
   bioEn              String
   bioMn              String?
-  videoUrls          String // JSON array
+  videoUrls          String // JSON array — Google Drive file/folder share links
   videoFileUrls      String   @default("[]")
-  photoUrls          String // JSON array — first is headshot
+  photoUrls          String // JSON array — first is headshot (optional if photosDriveUrl set)
+  photosDriveUrl     String? // Google Drive folder for photo pack
   resumeUrl          String?
+  resumeDriveUrl     String? // Google Drive link to CV
   yearsExperience    Int?
   availabilityWindow String?
   preferredRegions   String   @default("[]")
