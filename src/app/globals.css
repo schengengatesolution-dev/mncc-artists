@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0c;
+  --bg-elevated: #141418;
+  --gold: #c9a227;
+  --gold-soft: #e8d48b;
+  --cream: #f5f0e6;
+  --muted: #a39e93;
+  --border: #2a2a30;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--cream);
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.35);
+  color: #fff;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Print: one-page artist dossier */
+@media print {
+  @page {
+    margin: 12mm;
+    size: A4;
+  }
+
+  body {
+    background: white !important;
+    color: #111 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .dossier-print {
+    background: white !important;
+    color: #111 !important;
+    box-shadow: none !important;
+  }
+
+  .dossier-print a {
+    color: #111 !important;
+    text-decoration: underline;
+  }
+
+  .dossier-print img {
+    max-height: 180px !important;
+    break-inside: avoid;
+  }
+
+  .dossier-section {
+    break-inside: avoid;
+  }
+}
+
+.print-only {
+  display: none;
+}

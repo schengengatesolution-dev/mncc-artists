@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Offline local SQLite — copy over schema.prisma and set DATABASE_URL=file:./dev.db
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Artist {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  fullLegalName      String
+  stageName          String?
+  email              String
+  phone              String
+  nationality        String
+  actTypes           String // JSON array
+  actTitle           String
+  bioEn              String
+  bioMn              String?
+  videoUrls          String // JSON array
+  videoFileUrls      String   @default("[]")
+  photoUrls          String // JSON array — first is headshot
+  resumeUrl          String?
+  yearsExperience    Int?
+  availabilityWindow String?
+  preferredRegions   String   @default("[]")
+  desiredFeeNote     String?
+  techRider          String?
+  agency             String?
+  consent            Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}

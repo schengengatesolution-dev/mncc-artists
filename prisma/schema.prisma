@@ -1,0 +1,39 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["mncc"]
+}
+
+model Artist {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  fullLegalName      String
+  stageName          String?
+  email              String
+  phone              String
+  nationality        String
+  actTypes           String
+  actTitle           String
+  bioEn              String
+  bioMn              String?
+  videoUrls          String
+  videoFileUrls      String   @default("[]")
+  photoUrls          String
+  resumeUrl          String?
+  yearsExperience    Int?
+  availabilityWindow String?
+  preferredRegions   String   @default("[]")
+  desiredFeeNote     String?
+  techRider          String?
+  agency             String?
+  consent            Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@schema("mncc")
+}
