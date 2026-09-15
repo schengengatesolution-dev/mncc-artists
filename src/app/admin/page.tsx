@@ -39,6 +39,7 @@ export default async function AdminPage() {
               <th className="px-4 py-3 font-medium">Types</th>
               <th className="px-4 py-3 font-medium">Email</th>
               <th className="px-4 py-3 font-medium">Phone</th>
+              <th className="px-4 py-3 font-medium">CV</th>
               <th className="px-4 py-3 font-medium">Dossier</th>
             </tr>
           </thead>
@@ -54,6 +55,18 @@ export default async function AdminPage() {
                 </td>
                 <td className="px-4 py-3">{a.email}</td>
                 <td className="px-4 py-3">{a.phone}</td>
+                <td className="px-4 py-3">
+                  {a.resumeUrl ? (
+                    <span
+                      className="rounded-full border border-theater-gold/40 px-2 py-0.5 text-xs text-theater-gold-soft"
+                      title="Resume / CV on file"
+                    >
+                      CV
+                    </span>
+                  ) : (
+                    <span className="text-theater-muted">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <Link
                     href={`/admin/artists/${a.slug}`}
@@ -77,7 +90,7 @@ export default async function AdminPage() {
             {artists.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-theater-muted"
                 >
                   No artists yet.

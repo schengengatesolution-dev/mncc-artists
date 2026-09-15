@@ -10,6 +10,7 @@ import {
 } from "@/lib/constants";
 import { parseJsonArray } from "@/lib/json";
 import { PrintButton } from "@/components/PrintButton";
+import { ResumeDownloadButton } from "@/components/ResumeDownloadButton";
 
 export type ArtistDossierData = {
   slug: string;
@@ -206,6 +207,21 @@ export function ArtistDossier({
         </section>
       )}
 
+      {/* Resume / CV */}
+      {artist.resumeUrl && (
+        <section className="dossier-section mt-10">
+          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
+            Resume / CV / Намтар
+          </h2>
+          <p className="mt-2 text-sm text-theater-muted">
+            Download the artist&apos;s curriculum vitae for festivals and casting.
+          </p>
+          <div className="mt-4">
+            <ResumeDownloadButton url={artist.resumeUrl} />
+          </div>
+        </section>
+      )}
+
       {/* Extra details */}
       {(regions.length > 0 ||
         artist.availabilityWindow ||
@@ -289,16 +305,12 @@ export function ArtistDossier({
             <p>Email: {artist.email}</p>
             <p>Phone: {artist.phone}</p>
             {artist.resumeUrl && (
-              <p>
-                Resume:{" "}
-                <a
-                  href={artist.resumeUrl}
+              <p className="pt-1">
+                <ResumeDownloadButton
+                  url={artist.resumeUrl}
+                  label="Resume download"
                   className="text-theater-gold-soft hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download
-                </a>
+                />
               </p>
             )}
           </div>
