@@ -66,14 +66,13 @@ export default function Cirque2026AuditionPage() {
             </span>
           </p>
           <p className="mt-4 text-sm text-theater-muted leading-relaxed">
-            Venue agreement is still being finalized with Cirque du Soleil;
-            MNCC is promoting these working dates. The earlier July 2026 timing
-            was postponed to November.
+            Public audition dates remain 28–29 November 2026. An earlier venue
+            rental draft referenced July 4–5 before the postponement to November.
           </p>
           <p className="mt-2 text-sm text-theater-muted leading-relaxed">
-            Байршлын гэрээ Cirque du Soleil-тай эцэслэгдэж байна; МНСС эдгээр
-            огноог сурталчилж байна. Өмнө төлөвлөсөн 2026 оны 7-р сарын хугацаа
-            11-р сар руу хойшилсон.
+            Олон нийтийн сонгон шалгаруулалтын огноо 2026 оны 11-р сарын 28–29
+            хэвээр. Өмнөх заалны түрээсийн төсөлд 7-р сарын 4–5 гэж байсан бөгөөд
+            дараа нь 11-р сар руу хойшилсон.
           </p>
         </section>
 
@@ -82,19 +81,21 @@ export default function Cirque2026AuditionPage() {
           <h2 className="text-sm uppercase tracking-wider text-theater-gold">
             Location / Байршил
           </h2>
-          <p className="mt-3 text-theater-cream/90">
-            Ulaanbaatar, Mongolia — gymnasium / arena (same gym previously
-            visited for Cirque Casting coordination).
+          <p className="mt-3 text-theater-cream/90 font-medium">
+            Sports gymnastics hall of the Technical Committee of Sports
+            Gymnastics
           </p>
-          <p className="mt-2 text-theater-cream/90">
-            Улаанбаатар, Монгол — биеийн тамирын заал / талбай (Cirque Casting-тай
-            зохицуулалт хийхэд зочилсон ижил заал).
+          <p className="mt-4 text-theater-cream/90">
+            8th khoroo, Sukhbaatar District, Ulaanbaatar
           </p>
-          <p className="mt-4 text-sm text-theater-gold-soft font-medium">
-            Exact venue name & street: TBA / to be announced
+          <p className="mt-1 text-theater-cream/90">
+            Сүхбаатар дүүрэг, 8-р хороо, Улаанбаатар
           </p>
-          <p className="mt-1 text-sm text-theater-gold-soft font-medium">
-            Нарийн байршлын нэр, гудамж: удахгүй зарлана (TBA)
+          <p className="mt-4 text-sm text-theater-muted leading-relaxed">
+            Same gym as the venue rental. Public audition dates remain 28–29
+            November 2026 (contract draft had July 4–5 before the
+            postponement). / Түрээсийн гэрээний ижил заал. Олон нийтийн огноо
+            2026.11.28–29 хэвээр (төсөлд өмнө 7-р сарын 4–5 гэж байсан).
           </p>
         </section>
 
