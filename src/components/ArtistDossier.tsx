@@ -16,8 +16,10 @@ export type ArtistDossierData = {
   slug: string;
   fullLegalName: string;
   stageName: string | null;
-  email: string;
-  phone: string;
+  /** Admin-only; omit or empty on public dossiers */
+  email?: string | null;
+  /** Admin-only; omit or empty on public dossiers */
+  phone?: string | null;
   nationality: string;
   actTypes: string;
   actTitle: string;
@@ -71,6 +73,43 @@ export function ArtistDossier({
         <div className="no-print mb-6 rounded-lg border border-theater-gold/40 bg-theater-gold/10 px-4 py-3 text-sm text-theater-gold-soft">
           Registration received. Share this dossier link with MNCC partners.
         </div>
+      )}
+
+      {showPrivateContact && (artist.email || artist.phone) && (
+        <section className="no-print mb-8 rounded-2xl border-2 border-theater-gold bg-theater-gold/15 p-6">
+          <h2 className="text-lg font-semibold text-theater-gold">
+            Contact artist (admin only)
+          </h2>
+          <p className="mt-1 text-sm text-theater-muted">
+            Private — not shown on the public dossier. / Зөвхөн админд — нийтийн профайлд харагдахгүй.
+          </p>
+          <div className="mt-4 space-y-2 text-theater-cream">
+            {artist.email && (
+              <p className="text-lg">
+                <span className="text-theater-muted text-sm block">Email</span>
+                <a
+                  href={`mailto:${artist.email}`}
+                  className="text-theater-gold-soft hover:underline font-medium break-all"
+                >
+                  {artist.email}
+                </a>
+              </p>
+            )}
+            {artist.phone && (
+              <p className="text-lg">
+                <span className="text-theater-muted text-sm block">
+                  Phone / WhatsApp
+                </span>
+                <a
+                  href={`tel:${artist.phone.replace(/\s/g, "")}`}
+                  className="text-theater-gold-soft hover:underline font-medium"
+                >
+                  {artist.phone}
+                </a>
+              </p>
+            )}
+          </div>
+        </section>
       )}
 
       <div className="no-print mb-6 flex flex-wrap gap-3 print:hidden">
@@ -319,13 +358,14 @@ export function ArtistDossier({
         </section>
       )}
 
-      {/* 6. Contact via MNCC only */}
+      {/* 6. Contact via MNCC only — never render artist email/phone on public */}
       <section className="dossier-section mt-10 rounded-2xl border border-theater-border bg-theater-elevated/50 p-6">
         <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-          Contact
+          Contact / Холбоо барих
         </h2>
         <p className="mt-2 text-theater-cream/90">
-          For bookings and casting, contact MNCC only:
+          For bookings and casting, contact New Circus Center only. /
+          Захиалга, кастинг: зөвхөн Шинэ цирк төвтэй холбогдоно.
         </p>
         <div className="mt-3 space-y-1 text-theater-gold-soft">
           <p>
@@ -350,36 +390,9 @@ export function ArtistDossier({
         </p>
         {!showPrivateContact && (
           <p className="mt-3 text-xs text-theater-muted">
-            Personal phone is withheld on public dossiers.
+            Artist personal phone and email are not shown on public dossiers. /
+            Уран бүтээлчийн хувийн утас, имэйл нийтийн профайл дээр харагдахгүй.
           </p>
-        )}
-        {showPrivateContact && (
-          <div className="mt-4 border-t border-theater-border pt-4 text-sm space-y-1">
-            <p className="text-theater-muted">Internal (admin only)</p>
-            <p>Email: {artist.email}</p>
-            <p>Phone: {artist.phone}</p>
-            {artist.resumeUrl && (
-              <p className="pt-1">
-                <ResumeDownloadButton
-                  url={artist.resumeUrl}
-                  label="Resume download"
-                  className="text-theater-gold-soft hover:underline"
-                />
-              </p>
-            )}
-            {resumeDriveUrl && (
-              <p className="pt-1">
-                <a
-                  href={resumeDriveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-theater-gold-soft hover:underline"
-                >
-                  CV on Drive
-                </a>
-              </p>
-            )}
-          </div>
         )}
       </section>
 

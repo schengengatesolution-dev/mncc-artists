@@ -30,15 +30,20 @@ export default async function AdminPage() {
         <AdminLogout />
       </div>
 
-      <div className="mt-8 overflow-x-auto rounded-xl border border-theater-border">
+      <div className="mt-6 rounded-xl border border-theater-gold/40 bg-theater-gold/10 px-4 py-3 text-sm text-theater-gold-soft">
+        <strong>Contact artist (admin only)</strong> — email &amp; phone below are private.
+        Public dossiers never show them. / Доорх имэйл, утас зөвхөн админд.
+      </div>
+
+      <div className="mt-4 overflow-x-auto rounded-xl border border-theater-border">
         <table className="w-full text-left text-sm">
           <thead className="bg-theater-elevated text-theater-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Name</th>
               <th className="px-4 py-3 font-medium">Act</th>
               <th className="px-4 py-3 font-medium">Types</th>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Phone</th>
+              <th className="px-4 py-3 font-medium">Private email</th>
+              <th className="px-4 py-3 font-medium">Private phone</th>
               <th className="px-4 py-3 font-medium">CV</th>
               <th className="px-4 py-3 font-medium">Dossier</th>
             </tr>
@@ -53,8 +58,22 @@ export default async function AdminPage() {
                 <td className="px-4 py-3 text-theater-muted">
                   {parseJsonArray(a.actTypes).join(", ")}
                 </td>
-                <td className="px-4 py-3">{a.email}</td>
-                <td className="px-4 py-3">{a.phone}</td>
+                <td className="px-4 py-3">
+                  <a
+                    href={`mailto:${a.email}`}
+                    className="text-theater-gold-soft hover:underline break-all"
+                  >
+                    {a.email}
+                  </a>
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <a
+                    href={`tel:${a.phone.replace(/\s/g, "")}`}
+                    className="text-theater-gold-soft hover:underline"
+                  >
+                    {a.phone}
+                  </a>
+                </td>
                 <td className="px-4 py-3">
                   {a.resumeUrl ? (
                     <span

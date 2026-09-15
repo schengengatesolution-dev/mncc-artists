@@ -26,6 +26,9 @@ export default async function AdminArtistPage({ params }: Props) {
           ← Artists
         </Link>
         <DeleteArtistButton slug={artist.slug} variant="button" />
+        <span className="text-xs text-theater-gold-soft">
+          Admin view — private contact shown below
+        </span>
       </div>
       <ArtistDossier artist={artist} showPrivateContact />
     </div>

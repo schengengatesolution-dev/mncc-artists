@@ -328,18 +328,6 @@ export function RegisterForm() {
             <input id="stageName" name="stageName" className={field} />
           </div>
           <div>
-            <label className={label} htmlFor="email">
-              Email *
-            </label>
-            <input id="email" name="email" type="email" required className={field} />
-          </div>
-          <div>
-            <label className={label} htmlFor="phone">
-              Phone / WhatsApp *
-            </label>
-            <input id="phone" name="phone" required className={field} />
-          </div>
-          <div>
             <label className={label} htmlFor="nationality">
               Nationality *
             </label>
@@ -350,6 +338,59 @@ export function RegisterForm() {
               Act title *
             </label>
             <input id="actTitle" name="actTitle" required className={field} />
+          </div>
+        </div>
+
+        {/* Private contact — admin only; never shown on public dossiers */}
+        <div className="rounded-xl border-2 border-theater-gold/50 bg-theater-gold/10 p-5 space-y-4">
+          <div>
+            <h3 className="text-base font-semibold text-theater-gold-soft">
+              Private contact / Зөвхөн админд харагдах холбоо барих
+            </h3>
+            <ul className="mt-2 space-y-1.5 text-sm text-theater-cream/90 list-disc pl-5">
+              <li>
+                Clients and festivals will <strong>not</strong> see this. /
+                Үйлчлүүлэгч, фестиваль үүнийг <strong>харахгүй</strong>.
+              </li>
+              <li>
+                Only New Circus Center admin contacts you when selected for work. /
+                Ажилд сонгогдсон үед зөвхөн Шинэ цирк төвийн админ холбогдоно.
+              </li>
+              <li>
+                Your public dossier shows MNCC contact only (mongolcircus@gmail.com). /
+                Нийтийн профайл дээр зөвхөн Шинэ цирк төвийн холбоо барих харагдана.
+              </li>
+            </ul>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={label} htmlFor="email">
+                Private email * / Хувийн имэйл *
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@example.com"
+                className={field}
+              />
+            </div>
+            <div>
+              <label className={label} htmlFor="phone">
+                Private phone / WhatsApp * / Хувийн утас / WhatsApp *
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                autoComplete="tel"
+                placeholder="+976 …"
+                className={field}
+              />
+            </div>
           </div>
         </div>
 
