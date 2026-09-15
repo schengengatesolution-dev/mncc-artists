@@ -4,6 +4,7 @@ import { getAdminSession } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { parseJsonArray } from "@/lib/json";
 import { AdminLogout } from "@/components/AdminLogout";
+import { DeleteArtistButton } from "@/components/DeleteArtistButton";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ export default async function AdminPage() {
                 </td>
                 <td className="px-4 py-3">{a.email}</td>
                 <td className="px-4 py-3">{a.phone}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 whitespace-nowrap">
                   <Link
                     href={`/admin/artists/${a.slug}`}
                     className="text-theater-gold-soft hover:underline"
@@ -68,6 +69,8 @@ export default async function AdminPage() {
                   >
                     Public
                   </Link>
+                  {" · "}
+                  <DeleteArtistButton slug={a.slug} />
                 </td>
               </tr>
             ))}
