@@ -1,9 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  MNCC_ADDRESS,
   MNCC_CITY,
   MNCC_EMAIL,
   MNCC_ORG,
+  MNCC_PHONE_DISPLAY,
+  MNCC_PHONE_TEL,
 } from "@/lib/constants";
 import { parseJsonArray } from "@/lib/json";
 import { PrintButton } from "@/components/PrintButton";
@@ -254,12 +257,27 @@ export function ArtistDossier({
         <p className="mt-2 text-theater-cream/90">
           For bookings and casting, contact MNCC only:
         </p>
-        <a
-          href={`mailto:${MNCC_EMAIL}`}
-          className="mt-2 inline-block text-theater-gold-soft hover:underline text-lg"
-        >
-          {MNCC_EMAIL}
-        </a>
+        <div className="mt-3 space-y-1 text-theater-gold-soft">
+          <p>
+            <a
+              href={`tel:${MNCC_PHONE_TEL}`}
+              className="hover:underline text-lg"
+            >
+              {MNCC_PHONE_DISPLAY}
+            </a>
+          </p>
+          <p>
+            <a
+              href={`mailto:${MNCC_EMAIL}`}
+              className="hover:underline text-lg"
+            >
+              {MNCC_EMAIL}
+            </a>
+          </p>
+        </div>
+        <p className="mt-3 text-xs text-theater-muted leading-relaxed max-w-xl">
+          {MNCC_ADDRESS}
+        </p>
         {!showPrivateContact && (
           <p className="mt-3 text-xs text-theater-muted">
             Personal phone is withheld on public dossiers.
@@ -288,8 +306,20 @@ export function ArtistDossier({
       </section>
 
       {/* 7. Footer */}
-      <footer className="dossier-section mt-12 border-t border-theater-border pt-6 text-center text-sm text-theater-muted">
-        {MNCC_ORG} · {MNCC_CITY}
+      <footer className="dossier-section mt-12 border-t border-theater-border pt-6 text-center text-sm text-theater-muted space-y-1">
+        <p>
+          {MNCC_ORG} · {MNCC_CITY}
+        </p>
+        <p>
+          <a href={`tel:${MNCC_PHONE_TEL}`} className="text-theater-gold-soft hover:underline">
+            {MNCC_PHONE_DISPLAY}
+          </a>
+          {" · "}
+          <a href={`mailto:${MNCC_EMAIL}`} className="text-theater-gold-soft hover:underline">
+            {MNCC_EMAIL}
+          </a>
+        </p>
+        <p className="text-xs max-w-xl mx-auto leading-relaxed">{MNCC_ADDRESS}</p>
       </footer>
     </article>
   );

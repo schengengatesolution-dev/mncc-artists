@@ -5,7 +5,7 @@ export function SiteHeader() {
   return (
     <header className="no-print border-b border-theater-border/80 bg-theater-bg/90 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image
             src="/logo.png"
             alt="MNCC New Circus Center"
@@ -23,10 +23,22 @@ export function SiteHeader() {
             </div>
           </div>
         </Link>
-        <nav className="flex items-center gap-3 text-sm">
+        <nav className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 text-sm">
+          <Link
+            href="/auditions/cirque-2026"
+            className="rounded-full border border-theater-gold/50 px-3 py-2 text-xs sm:text-sm font-medium text-theater-gold-soft hover:bg-theater-gold/10 hover:border-theater-gold transition max-w-[14rem] sm:max-w-none text-center leading-snug"
+          >
+            <span className="hidden lg:inline">
+              2026 Cirque Du Soleil Audition / Нарны Цирк 2026 Сонгон
+              Шалгаруулалт
+            </span>
+            <span className="lg:hidden">
+              Cirque 2026 / Нарны Цирк 2026
+            </span>
+          </Link>
           <Link
             href="/register"
-            className="rounded-full bg-theater-gold px-4 py-2 font-medium text-theater-bg hover:bg-theater-gold-soft transition"
+            className="rounded-full bg-theater-gold px-4 py-2 font-medium text-theater-bg hover:bg-theater-gold-soft transition whitespace-nowrap"
           >
             Register / Бүртгүүлэх
           </Link>

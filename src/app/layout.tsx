@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · MNCC",
   },
   description:
-    "Circus Artist Resource — register once; MNCC presents you to festivals and contracts worldwide. New Circus Center, Ulaanbaatar.",
+    "Circus Artist Resource — register once; MNCC presents you to festivals and contracts worldwide. New Circus Center, Ulaanbaatar. Tel 9406-1666 · mongolcircus@gmail.com",
 };
 
 export default function RootLayout({

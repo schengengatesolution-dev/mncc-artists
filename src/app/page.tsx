@@ -1,6 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MNCC_EMAIL, MNCC_FACEBOOK } from "@/lib/constants";
+import {
+  MNCC_ADDRESS,
+  MNCC_EMAIL,
+  MNCC_FACEBOOK,
+  MNCC_PHONE_DISPLAY,
+  MNCC_PHONE_TEL,
+} from "@/lib/constants";
 
 export default function HomePage() {
   return (
@@ -82,9 +88,18 @@ export default function HomePage() {
       </section>
 
       <section className="border-t border-theater-border bg-theater-elevated/40">
-        <div className="mx-auto max-w-5xl px-4 py-12 text-center">
+        <div className="mx-auto max-w-5xl px-4 py-12 text-center space-y-3">
+          <p className="text-theater-cream/90 font-medium text-sm">
+            Contact / Холбоо барих
+          </p>
           <p className="text-theater-muted text-sm">
-            Questions?{" "}
+            <a
+              href={`tel:${MNCC_PHONE_TEL}`}
+              className="text-theater-gold-soft hover:underline"
+            >
+              {MNCC_PHONE_DISPLAY}
+            </a>
+            {" · "}
             <a
               href={`mailto:${MNCC_EMAIL}`}
               className="text-theater-gold-soft hover:underline"
@@ -100,6 +115,9 @@ export default function HomePage() {
             >
               Facebook
             </a>
+          </p>
+          <p className="text-theater-muted text-xs max-w-2xl mx-auto leading-relaxed">
+            {MNCC_ADDRESS}
           </p>
         </div>
       </section>

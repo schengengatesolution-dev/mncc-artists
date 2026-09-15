@@ -18,6 +18,7 @@ Bilingual EN/MN · Dark theatrical UI · Gold/cream accents
 |------|---------|
 | `/` | Landing + CTA |
 | `/register` | Artist registration form |
+| `/auditions/cirque-2026` | 2026 Cirque Du Soleil Audition placeholder |
 | `/artists/[slug]` | Public dossier (phone hidden; contact via mongolcircus@gmail.com) |
 | `/admin/login` | Admin password login |
 | `/admin` | Artist list + open dossiers (full contact) |
@@ -94,8 +95,10 @@ Official circular cyan/red/blue **New Circus** logo: `public/logo.png` (HD: `pub
 
 ## Contact
 
+- Phone: 9406-1666 (`tel:+97694061666`)
 - mongolcircus@gmail.com
 - https://www.facebook.com/MongolianNewCircus/
+- Address: Ардын Аюушийн өргөн чөлөө, Монголын Үндэсний Их Сургууль, Баянгол дүүрэг - 11-р хороо, Улаанбаатар 16060
 - New Circus Center · Ulaanbaatar
 
 ## Repo

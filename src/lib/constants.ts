@@ -25,4 +25,13 @@ export const MNCC_FACEBOOK = "https://www.facebook.com/MongolianNewCircus/";
 export const MNCC_ORG = "New Circus Center";
 export const MNCC_CITY = "Ulaanbaatar";
 
+/** Display phone (Mongolia local format) */
+export const MNCC_PHONE_DISPLAY = "9406-1666";
+/** tel: href with Mongolia country code */
+export const MNCC_PHONE_TEL = "+97694061666";
+
+/** Physical address (MN) */
+export const MNCC_ADDRESS =
+  "Ардын Аюушийн өргөн чөлөө, Монголын Үндэсний Их Сургууль, Баянгол дүүрэг - 11-р хороо, Улаанбаатар 16060";
+
 export const BIO_EN_MAX = 800;
