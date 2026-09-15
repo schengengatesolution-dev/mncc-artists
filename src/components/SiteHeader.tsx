@@ -9,9 +9,9 @@ export function SiteHeader() {
           <Image
             src="/logo.png"
             alt="MNCC New Circus Center"
-            width={48}
-            height={48}
-            className="h-12 w-12 object-contain"
+            width={56}
+            height={56}
+            className="h-14 w-14 object-contain"
             priority
           />
           <div className="leading-tight">
