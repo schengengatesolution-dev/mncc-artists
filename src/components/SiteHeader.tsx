@@ -4,7 +4,7 @@ import Image from "next/image";
 export function SiteHeader() {
   return (
     <header className="no-print border-b border-theater-border/80 bg-theater-bg/90 backdrop-blur sticky top-0 z-40">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image
             src="/logo.png"
@@ -26,15 +26,10 @@ export function SiteHeader() {
         <nav className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 text-sm">
           <Link
             href="/auditions/cirque-2026"
-            className="rounded-full border border-theater-gold/50 px-3 py-2 text-xs sm:text-sm font-medium text-theater-gold-soft hover:bg-theater-gold/10 hover:border-theater-gold transition max-w-[14rem] sm:max-w-none text-center leading-snug"
+            className="rounded-full border border-theater-gold/50 px-3 py-2 text-[11px] sm:text-xs md:text-sm font-medium text-theater-gold-soft hover:bg-theater-gold/10 hover:border-theater-gold transition text-center leading-snug"
           >
-            <span className="hidden lg:inline">
-              2026 Cirque Du Soleil Audition / Нарны Цирк 2026 Сонгон
-              Шалгаруулалт
-            </span>
-            <span className="lg:hidden">
-              Cirque 2026 / Нарны Цирк 2026
-            </span>
+            2026 Cirque Du Soleil Audition / Нарны Цирк 2026 Сонгон
+            Шалгаруулалт
           </Link>
           <Link
             href="/register"
