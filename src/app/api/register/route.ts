@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { uploadFile } from "@/lib/uploads";
+import { uploadFile, UploadError } from "@/lib/uploads";
 import { toJsonArray } from "@/lib/json";
 import { uniqueSlug } from "@/lib/slug";
 import { BIO_EN_MAX } from "@/lib/constants";
@@ -110,19 +110,40 @@ export async function POST(req: Request) {
       );
     }
 
-    const photoUrls: string[] = [];
-    for (const file of photoFiles.slice(0, 8)) {
-      photoUrls.push(await uploadFile(file, "photos"));
-    }
-
-    const resumeUrl = await uploadFile(resume, "resumes");
-
-    const videoFileInputs = fd
-      .getAll("videoFiles")
-      .filter((f): f is File => f instanceof File && f.size > 0);
-    const videoFileUrls: string[] = [];
-    for (const file of videoFileInputs.slice(0, 5)) {
-      videoFileUrls.push(await uploadFile(file, "videos"));
+    let photoUrls: string[];
+    let resumeUrl: string;
+    let videoFileUrls: string[];
+    try {
+      photoUrls = [];
+      for (const file of photoFiles.slice(0, 8)) {
+        photoUrls.push(await uploadFile(file, "photos"));
+      }
+      resumeUrl = await uploadFile(resume, "resumes");
+      const videoFileInputs = fd
+        .getAll("videoFiles")
+        .filter((f): f is File => f instanceof File && f.size > 0);
+      videoFileUrls = [];
+      for (const file of videoFileInputs.slice(0, 5)) {
+        videoFileUrls.push(await uploadFile(file, "videos"));
+      }
+    } catch (uploadErr) {
+      console.error("register upload error", uploadErr);
+      if (uploadErr instanceof UploadError) {
+        return NextResponse.json(
+          { error: uploadErr.message },
+          { status: 400 }
+        );
+      }
+      const detail =
+        uploadErr instanceof Error ? uploadErr.message : "unknown upload error";
+      return NextResponse.json(
+        {
+          error:
+            "Upload failed. Use smaller photos (≤2MB) and resume (≤5MB), or set BLOB_READ_WRITE_TOKEN.",
+          detail: process.env.NODE_ENV === "development" ? detail : undefined,
+        },
+        { status: 500 }
+      );
     }
 
     const baseName = stageName || fullLegalName;
@@ -163,9 +184,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ slug: artist.slug, id: artist.id });
   } catch (err) {
     console.error("register error", err);
-    return NextResponse.json(
-      { error: "Server error during registration." },
-      { status: 500 }
-    );
+    const hint =
+      err instanceof Error &&
+      /upload|EROFS|EACCES|ENOENT|blob|data:/i.test(err.message)
+        ? "Upload or storage failed during registration."
+        : "Server error during registration.";
+    return NextResponse.json({ error: hint }, { status: 500 });
   }
 }
