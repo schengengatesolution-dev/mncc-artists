@@ -11,10 +11,11 @@ export class UploadError extends Error {
   }
 }
 
-const PHOTO_MAX = 2 * 1024 * 1024; // 2MB (data-URL / no-Blob)
-const RESUME_MAX = 5 * 1024 * 1024; // 5MB
-const VIDEO_MAX = 2 * 1024 * 1024; // 2MB
-const DEFAULT_MAX = 2 * 1024 * 1024;
+/** Without Blob, data-URL fallback must fit Vercel ~4.5MB request + DB size. */
+const PHOTO_MAX = 1.5 * 1024 * 1024; // 1.5MB
+const RESUME_MAX = 4 * 1024 * 1024; // 4MB
+const VIDEO_MAX = 1.5 * 1024 * 1024; // 1.5MB
+const DEFAULT_MAX = 1.5 * 1024 * 1024;
 
 function maxBytesForFolder(folder: string): number {
   if (folder === "photos") return PHOTO_MAX;
@@ -24,7 +25,8 @@ function maxBytesForFolder(folder: string): number {
 }
 
 function maxLabel(bytes: number): string {
-  return `${Math.round(bytes / (1024 * 1024))}MB`;
+  const mb = bytes / (1024 * 1024);
+  return Number.isInteger(mb) ? `${mb}MB` : `${mb.toFixed(1)}MB`;
 }
 
 function safeName(original: string): string {

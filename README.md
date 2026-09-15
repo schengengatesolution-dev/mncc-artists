@@ -9,7 +9,7 @@ Bilingual EN/MN · Dark theatrical UI · Gold/cream accents
 - Next.js 14 App Router + TypeScript + Tailwind
 - Prisma + **Postgres (Neon)** — tables live in schema `mncc` (safe alongside other apps)
 - Optional offline SQLite: see `prisma/schema.sqlite.prisma`
-- Uploads: `@vercel/blob` when `BLOB_READ_WRITE_TOKEN` is set; else local `public/uploads` in dev, or **data-URL fallback** on read-only hosts (Vercel) for photos ≤2MB / resume ≤5MB
+- Uploads: `@vercel/blob` when `BLOB_READ_WRITE_TOKEN` is set; else local `public/uploads` in dev, or **data-URL fallback** on read-only hosts (Vercel) for photos ≤1.5MB / resume ≤4MB
 - Admin: cookie JWT via `ADMIN_PASSWORD` + `AUTH_SECRET`
 
 ## Routes
@@ -62,7 +62,7 @@ npx prisma db push && npm run seed
 | `DATABASE_URL` | yes | Neon Postgres URL (Prisma uses schema `mncc`) |
 | `ADMIN_PASSWORD` | yes | Admin login — demo default `mncc-admin-demo` |
 | `AUTH_SECRET` | yes | JWT signing secret |
-| `BLOB_READ_WRITE_TOKEN` | no | Vercel Blob for durable uploads. **Set this on Vercel for production.** Until then, registration stores small files as `data:` URLs (photos ≤2MB, resume ≤5MB). |
+| `BLOB_READ_WRITE_TOKEN` | **strongly recommended** | Vercel Blob for durable uploads. **Add this on Vercel for production** (see below). Without it, registration stores small files as `data:` URLs (photos ≤1.5MB each, resume ≤4MB) and large multipart bodies can hit Vercel’s ~4.5MB request limit. |
 
 ## Production (Vercel)
 
@@ -78,9 +78,18 @@ npx prisma db push && npm run seed
 | `DATABASE_URL` | Neon Postgres URL. This app uses Prisma schema **`mncc`** (won’t drop other tables). |
 | `ADMIN_PASSWORD` | Change from demo `mncc-admin-demo` |
 | `AUTH_SECRET` | Long random string |
-| `BLOB_READ_WRITE_TOKEN` | **Recommended on Vercel** — durable Blob uploads. Without it, MVP uses in-DB `data:` URLs (photos ≤2MB, resume ≤5MB). |
+| `BLOB_READ_WRITE_TOKEN` | **Strongly recommended** — durable Blob uploads. Without it, MVP uses in-DB `data:` URLs (photos ≤1.5MB, resume ≤4MB) and large uploads fail with Network/413 errors. |
 
-**Uploads without Blob:** On Vercel the serverless filesystem is not writable, so without `BLOB_READ_WRITE_TOKEN` the API embeds small files as `data:` URL strings in Postgres (works for dossier `<img>` and resume links). Set the Blob token for durable, CDN-backed files.
+**Uploads / Vercel Blob (required for multi‑MB photos):** On Vercel the serverless filesystem is not writable. Without `BLOB_READ_WRITE_TOKEN` the API embeds small files as `data:` URL strings in Postgres (works for dossier `<img>` and resume links) with tight size caps (photos ≤1.5MB each, resume ≤4MB, video files ≤1.5MB). Large multipart requests can exceed Vercel’s ~4.5MB body limit and surface as a generic client “Network error.”
+
+### Add Vercel Blob (do this once)
+
+1. Vercel Dashboard → your `mncc-artists` project → **Storage** → **Create** → **Blob**.
+2. Connect the store to the project (Production + Preview).
+3. Vercel injects `BLOB_READ_WRITE_TOKEN` automatically — **do not paste tokens into git or chat**.
+4. Redeploy. After that, larger durable uploads work via `@vercel/blob`.
+
+Until Blob is connected, artists should compress photos to ≤1.5MB (the register form auto-compresses images toward ≤1.2MB JPEG) and prefer YouTube/Vimeo links instead of video file uploads.
 
 5. Deploy. Then from a machine with the same `DATABASE_URL`:
    ```bash

@@ -6,6 +6,7 @@ import { uniqueSlug } from "@/lib/slug";
 import { BIO_EN_MAX } from "@/lib/constants";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function isVideoUrl(url: string): boolean {
   try {
@@ -139,7 +140,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "Upload failed. Use smaller photos (≤2MB) and resume (≤5MB), or set BLOB_READ_WRITE_TOKEN.",
+            "Upload failed. Use smaller photos (≤1.5MB each) and resume (≤4MB), or set BLOB_READ_WRITE_TOKEN.",
           detail: process.env.NODE_ENV === "development" ? detail : undefined,
         },
         { status: 500 }

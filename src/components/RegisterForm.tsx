@@ -8,6 +8,126 @@ import {
   PREFERRED_REGIONS,
 } from "@/lib/constants";
 
+const PHOTO_MAX = 1.5 * 1024 * 1024; // 1.5MB
+const RESUME_MAX = 4 * 1024 * 1024; // 4MB
+const VIDEO_FILE_MAX = 1.5 * 1024 * 1024; // 1.5MB
+const COMPRESS_TARGET = 1.2 * 1024 * 1024; // 1.2MB JPEG target
+const MAX_PHOTOS = 8;
+
+function formatMb(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+/** Compress an image to JPEG under target size via canvas. Keeps original name. */
+async function compressImageToJpeg(
+  file: File,
+  targetBytes = COMPRESS_TARGET
+): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/gif") {
+    return file;
+  }
+  if (file.size <= targetBytes && file.type === "image/jpeg") {
+    return file;
+  }
+
+  try {
+    const source = await createImageBitmap(file);
+    let width = source.width;
+    let height = source.height;
+    source.close();
+
+    const maxDim = 2000;
+    if (width > maxDim || height > maxDim) {
+      const scale = maxDim / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+
+    let best: Blob | null = null;
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      canvas.width = width;
+      canvas.height = height;
+      const bmp = await createImageBitmap(file);
+      ctx.drawImage(bmp, 0, 0, width, height);
+      bmp.close();
+
+      let quality = 0.85;
+      for (let q = 0; q < 6; q++) {
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, "image/jpeg", quality)
+        );
+        if (!blob) break;
+        if (!best || blob.size < best.size) best = blob;
+        if (blob.size <= targetBytes) {
+          return new File([blob], file.name, {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+        }
+        quality -= 0.1;
+      }
+
+      width = Math.round(width * 0.75);
+      height = Math.round(height * 0.75);
+      if (width < 400 || height < 400) break;
+    }
+
+    if (best && best.size < file.size) {
+      return new File([best], file.name, {
+        type: "image/jpeg",
+        lastModified: Date.now(),
+      });
+    }
+    return file;
+  } catch {
+    return file;
+  }
+}
+
+function validateClientFiles(
+  photos: File[],
+  resume: File | null,
+  videoFiles: File[]
+): string | null {
+  if (photos.length === 0) {
+    return "Upload at least one photo. / Хамгийн багадаа 1 зураг оруулна уу.";
+  }
+  if (photos.length > MAX_PHOTOS) {
+    return `Maximum ${MAX_PHOTOS} photos. / Хамгийн ихдээ ${MAX_PHOTOS} зураг.`;
+  }
+  for (const f of photos) {
+    if (f.size > PHOTO_MAX) {
+      return (
+        `Photo "${f.name}" is too large (${formatMb(f.size)}). Max ${formatMb(PHOTO_MAX)} each. ` +
+        `/ Зураг хэт том байна. Зураг бүрийг ${formatMb(PHOTO_MAX)}-аас бага болгоно уу.`
+      );
+    }
+  }
+  if (!resume || resume.size === 0) {
+    return "Resume/CV is required. / CV заавал оруулна уу.";
+  }
+  if (resume.size > RESUME_MAX) {
+    return (
+      `Resume is too large (${formatMb(resume.size)}). Max ${formatMb(RESUME_MAX)}. ` +
+      `/ CV хэт том байна. Хамгийн ихдээ ${formatMb(RESUME_MAX)}.`
+    );
+  }
+  for (const f of videoFiles) {
+    if (f.size > VIDEO_FILE_MAX) {
+      return (
+        `Video file "${f.name}" is too large (${formatMb(f.size)}). Max ${formatMb(VIDEO_FILE_MAX)}. Prefer a YouTube/Vimeo link. ` +
+        `/ Видео файл хэт том. YouTube/Vimeo холбоос илүү тохиромжтой.`
+      );
+    }
+  }
+  return null;
+}
+
 export function RegisterForm() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -28,22 +148,102 @@ export function RegisterForm() {
     setBusy(true);
     try {
       const form = e.currentTarget;
-      const fd = new FormData(form);
-      fd.delete("actTypes");
-      fd.delete("preferredRegions");
+      const raw = new FormData(form);
+
+      const photoList = (raw.getAll("photos") as File[]).filter(
+        (f) => f instanceof File && f.size > 0
+      );
+      const resumeFile =
+        (raw.get("resume") instanceof File &&
+          (raw.get("resume") as File).size > 0 &&
+          (raw.get("resume") as File)) ||
+        null;
+      const videoList = (raw.getAll("videoFiles") as File[]).filter(
+        (f) => f instanceof File && f.size > 0
+      );
+
+      const validationError = validateClientFiles(
+        photoList,
+        resumeFile,
+        videoList
+      );
+      if (validationError) {
+        setError(validationError);
+        setBusy(false);
+        return;
+      }
+
+      // Compress photos client-side when possible (JPEG ≤1.2MB)
+      const compressedPhotos: File[] = [];
+      for (const photo of photoList) {
+        compressedPhotos.push(await compressImageToJpeg(photo));
+      }
+      // Re-check after compression (edge case: still over)
+      for (const f of compressedPhotos) {
+        if (f.size > PHOTO_MAX) {
+          setError(
+            `Photo "${f.name}" is still too large after compression (${formatMb(f.size)}). Max ${formatMb(PHOTO_MAX)}. ` +
+              `/ Шахасны дараа ч зураг хэт том байна. Жижиг зураг сонгоно уу.`
+          );
+          setBusy(false);
+          return;
+        }
+      }
+
+      const fd = new FormData();
+      Array.from(raw.entries()).forEach(([key, value]) => {
+        if (key === "photos" || key === "videoFiles" || key === "resume") return;
+        if (key === "actTypes" || key === "preferredRegions") return;
+        fd.append(key, value);
+      });
       actTypes.forEach((t) => fd.append("actTypes", t));
       regions.forEach((r) => fd.append("preferredRegions", r));
+      compressedPhotos.forEach((f) => fd.append("photos", f));
+      if (resumeFile) fd.append("resume", resumeFile);
+      videoList.forEach((f) => fd.append("videoFiles", f));
 
       const res = await fetch("/api/register", { method: "POST", body: fd });
-      const data = await res.json();
+
+      const contentType = res.headers.get("content-type") || "";
+      let data: { error?: string; detail?: string; slug?: string } = {};
+      let bodyText = "";
+      if (contentType.includes("application/json")) {
+        try {
+          data = await res.json();
+        } catch {
+          bodyText = "";
+        }
+      } else {
+        try {
+          bodyText = await res.text();
+        } catch {
+          bodyText = "";
+        }
+      }
+
       if (!res.ok) {
-        setError(data.error || "Registration failed");
+        const msg =
+          data.error ||
+          (bodyText && bodyText.slice(0, 200)) ||
+          `Request failed (HTTP ${res.status})`;
+        setError(
+          `${msg}${res.status === 413 ? " — payload too large; use smaller photos or YouTube/Vimeo links." : ""}`
+        );
+        setBusy(false);
+        return;
+      }
+
+      if (!data.slug) {
+        setError("Registration succeeded but no profile slug was returned.");
         setBusy(false);
         return;
       }
       router.push(`/artists/${data.slug}?registered=1`);
-    } catch {
-      setError("Network error. Please try again.");
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : "unknown";
+      setError(
+        `Network error (${detail}). Check your connection and try again. / Сүлжээний алдаа. Дахин оролдоно уу.`
+      );
       setBusy(false);
     }
   }
@@ -159,7 +359,7 @@ export function RegisterForm() {
 
         <div>
           <label className={label} htmlFor="photos">
-            Photos * (≥1, up to 8)
+            Photos * (≥1, up to 8 · ≤1.5MB each · auto-compressed)
           </label>
           <input
             id="photos"
@@ -170,11 +370,15 @@ export function RegisterForm() {
             required
             className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold file:px-3 file:py-1 file:text-theater-bg`}
           />
+          <p className="mt-1 text-xs text-theater-muted">
+            Max 1.5MB per photo. Large images are compressed in your browser. /
+            Зураг бүрийг 1.5MB-аас бага байлгана уу.
+          </p>
         </div>
 
         <div>
           <label className={label} htmlFor="resume">
-            Resume / CV (PDF or DOC) *
+            Resume / CV (PDF or DOC) * · ≤4MB
           </label>
           <input
             id="resume"
@@ -215,7 +419,7 @@ export function RegisterForm() {
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Extra video links (≤5)</p>
+          <p className={label}>Extra video links (≤5) — preferred</p>
           {[2, 3, 4, 5, 6].map((n) => (
             <input
               key={n}
@@ -229,7 +433,7 @@ export function RegisterForm() {
 
         <div>
           <label className={label} htmlFor="videoFiles">
-            Extra video file uploads
+            Extra video file uploads (optional · ≤1.5MB each — prefer YouTube/Vimeo link)
           </label>
           <input
             id="videoFiles"
@@ -239,6 +443,10 @@ export function RegisterForm() {
             multiple
             className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold/80 file:px-3 file:py-1 file:text-theater-bg`}
           />
+          <p className="mt-1 text-xs text-theater-muted">
+            Prefer a YouTube/Vimeo link above. Large video files often fail on the
+            server. / Том видео файлын оронд YouTube/Vimeo холбоос ашиглана уу.
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
