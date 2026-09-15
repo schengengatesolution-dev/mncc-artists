@@ -38,10 +38,10 @@ export function SiteHeader() {
             Register / Бүртгүүлэх
           </Link>
           <Link
-            href="/admin"
-            className="hidden sm:inline text-theater-muted hover:text-theater-cream"
+            href="/#contact"
+            className="rounded-full border border-theater-border px-4 py-2 text-theater-cream hover:border-theater-gold transition whitespace-nowrap"
           >
-            Admin
+            Contact / Холбоо барих
           </Link>
         </nav>
       </div>

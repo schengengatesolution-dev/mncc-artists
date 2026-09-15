@@ -4,14 +4,16 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "2026 Cirque Du Soleil Audition",
   description:
-    "2026 Cirque Du Soleil Audition / Нарны Цирк 2026 Сонгон Шалгаруулалт — working dates 28–29 November 2026, Ulaanbaatar. Apply via Cirque du Soleil Casting.",
+    "2026 Cirque Du Soleil Audition / Нарны Цирк 2026 Сонгон Шалгаруулалт — public audition dates 28–29 November 2026, Ulaanbaatar. Register with New Circus Center (MNCC).",
 };
 
-const CDS_CASTING = "https://casting.cirquedusoleil.com/";
-const CDS_DIRECT_APPLY =
-  "https://casting.my.salesforce-sites.com/ene/ts2mmx__JobDetails?jobId=a0xOF00000PeRRJYA3&tSource=";
 const ANNOUNCE_IG = "https://www.instagram.com/p/DWj-9q0D1tx/";
 const ANNOUNCE_FB = "https://www.facebook.com/share/p/18QkeCGBZY/";
+
+const VENUE_EN =
+  "Technical Committee of Sports Gymnastics hall, 8th khoroo, Sukhbaatar District, Ulaanbaatar";
+const VENUE_MN =
+  "Спорт гимнастикийн техникийн хорооны заал, Сүхбаатар дүүрэг, 8-р хороо, Улаанбаатар";
 
 export default function Cirque2026AuditionPage() {
   return (
@@ -31,136 +33,79 @@ export default function Cirque2026AuditionPage() {
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <a
-          href={CDS_CASTING}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-full bg-theater-gold px-5 py-2.5 text-sm font-semibold text-theater-bg hover:bg-theater-gold-soft transition"
-        >
-          Apply on Cirque Casting / CDS Casting-д бүртгүүлэх
-        </a>
         <Link
           href="/register"
-          className="rounded-full border border-theater-border px-5 py-2.5 text-sm text-theater-cream hover:border-theater-gold transition"
+          className="rounded-full bg-theater-gold px-5 py-2.5 text-sm font-semibold text-theater-bg hover:bg-theater-gold-soft transition"
         >
-          Also register MNCC dossier / МНСС досье бүртгүүлэх
+          Register with New Circus Center / Шинэ цирк төвд бүртгүүлэх
         </Link>
       </div>
 
       <div className="mt-10 space-y-6">
-        {/* Dates */}
+        {/* Audition dates + venue (one box) */}
         <section className="rounded-2xl border border-theater-border bg-theater-elevated/60 p-6">
           <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-            Dates / Огноо
+            Audition dates / Сонгон шалгаруулалтын огноо
           </h2>
-          <p className="mt-3 text-theater-cream/90 font-medium">
-            Working public dates:{" "}
-            <span className="text-theater-gold-soft">
-              28–29 November 2026 (Saturday–Sunday)
-            </span>
+          <p className="mt-3 text-theater-cream/90 leading-relaxed">
+            Public audition dates are{" "}
+            <span className="text-theater-gold-soft font-medium">
+              28–29 November 2026
+            </span>{" "}
+            at {VENUE_EN}.
           </p>
-          <p className="mt-2 text-theater-cream/90 font-medium">
-            Ажиллаж буй олон нийтийн огноо:{" "}
-            <span className="text-theater-gold-soft">
-              2026 оны 11-р сарын 28–29 (Бямба–Ням)
+          <p className="mt-3 text-theater-cream/90 leading-relaxed">
+            Олон нийтийн сонгон шалгаруулалтын огноо{" "}
+            <span className="text-theater-gold-soft font-medium">
+              2026 оны 11-р сарын 28–29
             </span>
+            , байршил: {VENUE_MN}.
           </p>
           <p className="mt-4 text-sm text-theater-muted leading-relaxed">
-            Public audition dates remain 28–29 November 2026. An earlier venue
-            rental draft referenced July 4–5 before the postponement to November.
+            Sports gymnastics hall of the Technical Committee of Sports
+            Gymnastics · Спорт гимнастикийн техникийн хорооны заал
+          </p>
+          <p className="mt-1 text-sm text-theater-muted">
+            8th khoroo, Sukhbaatar District, Ulaanbaatar · Сүхбаатар дүүрэг,
+            8-р хороо, Улаанбаатар
+          </p>
+        </section>
+
+        {/* Register via MNCC */}
+        <section className="rounded-2xl border border-theater-border bg-theater-elevated/60 p-6">
+          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
+            Register / Бүртгэл
+          </h2>
+          <p className="mt-3 text-sm text-theater-cream/90 leading-relaxed">
+            Register with New Circus Center (Шинэ цирк төв) with your bio and
+            videos. Artists who register enter MNCC’s process supporting the
+            Cirque du Soleil Mongolia audition.
           </p>
           <p className="mt-2 text-sm text-theater-muted leading-relaxed">
-            Олон нийтийн сонгон шалгаруулалтын огноо 2026 оны 11-р сарын 28–29
-            хэвээр. Өмнөх заалны түрээсийн төсөлд 7-р сарын 4–5 гэж байсан бөгөөд
-            дараа нь 11-р сар руу хойшилсон.
+            Шинэ цирк төвд намтар, видео бичлэгтэйгээ бүртгүүлнэ үү. Бүртгэлээр
+            та Cirque du Soleil-ийн Монгол дахь сонгон шалгаруулалтыг дэмжих Шинэ
+            цирк төвийн үйл явцад орно.
           </p>
-        </section>
 
-        {/* Location */}
-        <section className="rounded-2xl border border-theater-border bg-theater-elevated/60 p-6">
-          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-            Location / Байршил
-          </h2>
-          <p className="mt-3 text-theater-cream/90 font-medium">
-            Sports gymnastics hall of the Technical Committee of Sports
-            Gymnastics
-          </p>
-          <p className="mt-4 text-theater-cream/90">
-            8th khoroo, Sukhbaatar District, Ulaanbaatar
-          </p>
-          <p className="mt-1 text-theater-cream/90">
-            Сүхбаатар дүүрэг, 8-р хороо, Улаанбаатар
-          </p>
-          <p className="mt-4 text-sm text-theater-muted leading-relaxed">
-            Same gym as the venue rental. Public audition dates remain 28–29
-            November 2026 (contract draft had July 4–5 before the
-            postponement). / Түрээсийн гэрээний ижил заал. Олон нийтийн огноо
-            2026.11.28–29 хэвээр (төсөлд өмнө 7-р сарын 4–5 гэж байсан).
-          </p>
-        </section>
+          <Link
+            href="/register"
+            className="mt-5 inline-flex rounded-full bg-theater-gold px-5 py-2.5 text-sm font-semibold text-theater-bg hover:bg-theater-gold-soft transition"
+          >
+            Go to registration / Бүртгэлийн хуудас руу
+          </Link>
 
-        {/* Register / apply */}
-        <section className="rounded-2xl border border-theater-border bg-theater-elevated/60 p-6">
-          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-            Register / Apply · Бүртгэл / Өргөдөл
-          </h2>
-          <p className="mt-3 text-sm text-theater-muted leading-relaxed">
-            Primary path: apply through official Cirque du Soleil Casting.
-            / Гол зам: Cirque du Soleil Casting албан ёсны сайтаар бүртгүүлнэ.
-          </p>
-          <ul className="mt-4 space-y-3 text-sm">
-            <li>
-              <a
-                href={CDS_CASTING}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-theater-gold-soft hover:underline break-all"
-              >
-                {CDS_CASTING}
-              </a>
-              <span className="block text-theater-muted mt-0.5">
-                Official Cirque Casting portal / Албан ёсны Casting портал
-              </span>
-            </li>
-            <li>
-              <a
-                href={CDS_DIRECT_APPLY}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-theater-gold-soft hover:underline break-all"
-              >
-                Direct job application link (from Cirque Casting)
-              </a>
-              <span className="block text-theater-muted mt-0.5">
-                Шууд өргөдлийн холбоос (Cirque Casting-аас). Whether this jobId
-                remains valid for the November dates is unknown — please confirm
-                on CDS Casting and watch MNCC updates. / Энэ jobId 11-р сарын
-                огноонд хүчинтэй эсэх тодорхойгүй — CDS Casting болон МНСС
-                шинэчлэлтийг шалгана уу.
-              </span>
-            </li>
-          </ul>
-
-          <div className="mt-5 rounded-xl border border-theater-border/80 bg-theater-bg/40 p-4 text-sm text-theater-muted leading-relaxed space-y-2">
-            <p>
-              The April 2026 deadline (26 Apr) applied to the{" "}
-              <em>previous July</em> timing and is superseded. Applicants already
-              accepted for that earlier round will be re-contacted (per Cirque
-              Casting). New applicants should use the official apply links above.
-            </p>
-            <p>
-              2026 оны 4-р сарын 26-ны хугацаа нь{" "}
-              <em>өмнөх 7-р сарын</em> хуваарьт хамааралтай байсан бөгөөд одоо
-              хүчингүй. Тэр үед хүлээн зөвшөөрөгдсөн өргөдөл гаргагчдад дахин
-              холбогдох болно (Cirque Casting-ийн дагуу). Шинэ өргөдөл гаргагчид
-              дээрх албан ёсны холбоосыг ашиглана.
-            </p>
-          </div>
-
-          <p className="mt-5 text-sm text-theater-muted">
+          <p className="mt-6 text-sm text-theater-muted">
             Announcement posts / Зарлалын нийтлэл:
           </p>
-          <ul className="mt-2 space-y-1 text-sm">
+          <p className="mt-2 text-sm text-theater-cream/90 leading-relaxed">
+            First announced around 26 April 2026; now scheduled 28–29 November
+            2026.
+          </p>
+          <p className="mt-1 text-sm text-theater-muted leading-relaxed">
+            Анх 2026 оны 4-р сарын 26 орчим зарлагдсан; одоо 2026 оны 11-р сарын
+            28–29-нд товлогдсон.
+          </p>
+          <ul className="mt-3 space-y-1 text-sm">
             <li>
               Instagram:{" "}
               <a
@@ -184,26 +129,6 @@ export default function Cirque2026AuditionPage() {
               </a>
             </li>
           </ul>
-
-          <p className="mt-5 text-sm text-theater-cream/90">
-            Secondary: also create your MNCC artist dossier so MNCC can support
-            you.{" "}
-            <Link
-              href="/register"
-              className="text-theater-gold-soft hover:underline"
-            >
-              Register at /register
-            </Link>
-          </p>
-          <p className="mt-1 text-sm text-theater-muted">
-            Нэмэлт: МНСС таныг дэмжихийн тулд уран бүтээлчийн досье бүртгүүлнэ үү.{" "}
-            <Link
-              href="/register"
-              className="text-theater-gold-soft hover:underline"
-            >
-              /register хуудас
-            </Link>
-          </p>
         </section>
 
         {/* Expect / bring */}
@@ -212,9 +137,7 @@ export default function Cirque2026AuditionPage() {
             What to expect / Юу хүлээх вэ
           </h2>
           <ul className="mt-3 space-y-2 text-sm text-theater-cream/90 list-disc pl-5">
-            <li>
-              Live audition / workshop · Амьд сонсгол / воркшоп
-            </li>
+            <li>Live audition / workshop · Амьд сонсгол / воркшоп</li>
             <li>
               What to bring: TBA — follow Cirque du Soleil Casting instructions ·
               Юу авчрах: удахгүй — Cirque Casting-ийн зааврыг дагана
@@ -224,21 +147,6 @@ export default function Cirque2026AuditionPage() {
               ихэвчлэн зөвшөөрдөггүй
             </li>
           </ul>
-        </section>
-
-        {/* Promotion */}
-        <section className="rounded-2xl border border-theater-border bg-theater-elevated/60 p-6">
-          <h2 className="text-sm uppercase tracking-wider text-theater-gold">
-            Promotion / Сурталчилгаа
-          </h2>
-          <p className="mt-3 text-sm text-theater-muted leading-relaxed">
-            MNCC plans video / Instagram / Facebook promotion in October–November
-            (subject to Cirque du Soleil).
-          </p>
-          <p className="mt-2 text-sm text-theater-muted leading-relaxed">
-            МНСС 10–11-р сард видео / Instagram / Facebook сурталчилгаа төлөвлөж
-            байна (Cirque du Soleil-ийн зөвшөөрлөөс хамаарна).
-          </p>
         </section>
       </div>
 

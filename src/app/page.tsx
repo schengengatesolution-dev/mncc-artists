@@ -2,8 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   MNCC_ADDRESS,
+  MNCC_ADDRESS_EN,
   MNCC_EMAIL,
   MNCC_FACEBOOK,
+  MNCC_ORG_MN,
   MNCC_PHONE_DISPLAY,
   MNCC_PHONE_TEL,
 } from "@/lib/constants";
@@ -31,12 +33,12 @@ export default function HomePage() {
             Circus Artist Resource
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-theater-gold-soft/90 text-balance">
-            Register once; MNCC presents you to festivals and contracts
+            Register once: MNCC presents you to festivals and contracts
             worldwide.
           </p>
           <p className="mt-3 max-w-2xl text-base text-theater-muted text-balance">
-            Нэг удаа бүртгүүлээд — МНСС таныг дэлхийн фестиваль, гэрээ хэлэлцээрүүдэд
-            танилцуулна.
+            Нэг удаа бүртгүүлээд — {MNCC_ORG_MN} таныг дэлхийн фестиваль, гэрээ
+            хэлэлцээрүүдэд танилцуулна.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
@@ -46,12 +48,12 @@ export default function HomePage() {
             >
               Register as artist / Уран бүтээлчээр бүртгүүлэх
             </Link>
-            <a
-              href={`mailto:${MNCC_EMAIL}`}
+            <Link
+              href="/#contact"
               className="rounded-full border border-theater-border px-6 py-3 text-base text-theater-cream hover:border-theater-gold transition"
             >
               Contact MNCC
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -61,7 +63,7 @@ export default function HomePage() {
           {
             en: "One registration",
             mn: "Нэг бүртгэл",
-            body: "Bio, videos, photos, and CV in one shareable dossier.",
+            body: "Bio, videos, photos, and CV in one shareable artist profile.",
           },
           {
             en: "Festival & casting ready",
@@ -71,7 +73,7 @@ export default function HomePage() {
           {
             en: "Privacy first",
             mn: "Хувийн мэдээлэл хамгаалалттай",
-            body: "Public dossiers hide your phone — contact via MNCC only.",
+            body: "Public profiles hide your phone — contact via MNCC only.",
           },
         ].map((card) => (
           <div
@@ -87,7 +89,10 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section className="border-t border-theater-border bg-theater-elevated/40">
+      <section
+        id="contact"
+        className="border-t border-theater-border bg-theater-elevated/40 scroll-mt-24"
+      >
         <div className="mx-auto max-w-5xl px-4 py-12 text-center space-y-3">
           <p className="text-theater-cream/90 font-medium text-sm">
             Contact / Холбоо барих
@@ -118,6 +123,9 @@ export default function HomePage() {
           </p>
           <p className="text-theater-muted text-xs max-w-2xl mx-auto leading-relaxed">
             {MNCC_ADDRESS}
+          </p>
+          <p className="text-theater-muted text-xs max-w-2xl mx-auto leading-relaxed">
+            {MNCC_ADDRESS_EN}
           </p>
         </div>
       </section>

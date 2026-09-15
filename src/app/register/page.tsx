@@ -12,7 +12,7 @@ export default function RegisterPage() {
         Artist registration
       </h1>
       <p className="mt-2 text-theater-muted">
-        Уран бүтээлчийн бүртгэл — fill once; MNCC builds your shareable dossier.
+        Уран бүтээлчийн бүртгэл — fill once; MNCC builds your shareable artist profile.
       </p>
       <div className="mt-8">
         <RegisterForm />

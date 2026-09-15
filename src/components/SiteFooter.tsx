@@ -1,10 +1,12 @@
 import Image from "next/image";
 import {
   MNCC_ADDRESS,
+  MNCC_ADDRESS_EN,
   MNCC_CITY,
   MNCC_EMAIL,
   MNCC_FACEBOOK,
   MNCC_ORG,
+  MNCC_ORG_MN,
   MNCC_PHONE_DISPLAY,
   MNCC_PHONE_TEL,
 } from "@/lib/constants";
@@ -23,13 +25,16 @@ export function SiteFooter() {
           />
           <div>
             <p className="text-theater-cream/90 font-medium">
-              {MNCC_ORG} · {MNCC_CITY}
+              {MNCC_ORG} · {MNCC_ORG_MN} · {MNCC_CITY}
             </p>
             <p className="mt-1 text-xs opacity-70">
               Mongolian New Circus Center — Artist Resource Bank
             </p>
             <p className="mt-2 max-w-md text-xs leading-relaxed opacity-80">
               {MNCC_ADDRESS}
+            </p>
+            <p className="mt-1 max-w-md text-xs leading-relaxed opacity-80">
+              {MNCC_ADDRESS_EN}
             </p>
           </div>
         </div>

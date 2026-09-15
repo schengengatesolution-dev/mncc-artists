@@ -196,7 +196,7 @@ export function RegisterForm() {
           />
           <span>
             I consent that MNCC may use these materials for festival and casting
-            outreach. / МНСС эдгээр материалыг фестиваль, кастингийн зорилгоор
+            outreach. / Шинэ цирк төв эдгээр материалыг фестиваль, кастингийн зорилгоор
             ашиглахыг зөвшөөрч байна. *
           </span>
         </label>
