@@ -357,10 +357,18 @@ export function RegisterForm() {
           />
         </div>
 
+        <div className="rounded-lg border border-theater-gold/30 bg-theater-gold/5 px-3 py-2 text-xs text-theater-cream/90">
+          Large phone photos often fail — compress or resize first / Утасны том
+          зураг алдаа гаргаж болно — жижигрүүлээд оруулна уу.
+        </div>
+
         <div>
           <label className={label} htmlFor="photos">
-            Photos * (≥1, up to 8 · ≤1.5MB each · auto-compressed)
+            Photos *
           </label>
+          <p className="mt-0.5 text-xs text-theater-muted">
+            max 1.5MB each · up to 8 · Зураг: нэг бүр 1.5MB хүртэл (хамгийн ихдээ 8)
+          </p>
           <input
             id="photos"
             name="photos"
@@ -371,15 +379,17 @@ export function RegisterForm() {
             className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold file:px-3 file:py-1 file:text-theater-bg`}
           />
           <p className="mt-1 text-xs text-theater-muted">
-            Max 1.5MB per photo. Large images are compressed in your browser. /
-            Зураг бүрийг 1.5MB-аас бага байлгана уу.
+            Large images are auto-compressed in your browser toward ≤1.2MB JPEG.
           </p>
         </div>
 
         <div>
           <label className={label} htmlFor="resume">
-            Resume / CV (PDF or DOC) * · ≤4MB
+            Resume / CV *
           </label>
+          <p className="mt-0.5 text-xs text-theater-muted">
+            max 4MB · PDF/DOC · Намтар: 4MB хүртэл
+          </p>
           <input
             id="resume"
             name="resume"
@@ -433,8 +443,12 @@ export function RegisterForm() {
 
         <div>
           <label className={label} htmlFor="videoFiles">
-            Extra video file uploads (optional · ≤1.5MB each — prefer YouTube/Vimeo link)
+            Extra video file uploads (optional)
           </label>
+          <p className="mt-0.5 text-xs text-theater-muted">
+            max 1.5MB each — prefer YouTube/Vimeo link · Видео файл: 1.5MB
+            (YouTube/Vimeo холбоос илүү дээр)
+          </p>
           <input
             id="videoFiles"
             name="videoFiles"
@@ -443,10 +457,6 @@ export function RegisterForm() {
             multiple
             className={`${field} file:mr-3 file:rounded file:border-0 file:bg-theater-gold/80 file:px-3 file:py-1 file:text-theater-bg`}
           />
-          <p className="mt-1 text-xs text-theater-muted">
-            Prefer a YouTube/Vimeo link above. Large video files often fail on the
-            server. / Том видео файлын оронд YouTube/Vimeo холбоос ашиглана уу.
-          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
