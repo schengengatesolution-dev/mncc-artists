@@ -65,10 +65,32 @@ npx prisma db push && npm run seed
 
 ## Production (Vercel)
 
-1. Import GitHub repo `schengengatesolution-dev/mncc-artists` (project name `mncc-artists`).
-2. Set env: `DATABASE_URL`, `ADMIN_PASSWORD`, `AUTH_SECRET`, optionally `BLOB_READ_WRITE_TOKEN`.
-3. Prefer a dedicated Neon database; this app uses Postgres schema `mncc` so it can share a Neon project without colliding with other tables.
-4. After first deploy (or before): `npx prisma db push` + `npm run seed` against that `DATABASE_URL`.
+**GitHub `main` is ready to Import.** Preferred project name: `mncc-artists`.
+
+1. Vercel Dashboard → Add New Project → Import `schengengatesolution-dev/mncc-artists`.
+2. If name `mncc-artists` is already taken by an empty/orphaned project, delete that project (or rename) and re-import, **or** use another name and set the production domain later.
+3. Framework: Next.js (auto). Build command: `prisma generate && next build` (already in `package.json` `build` script).
+4. Set Environment Variables (Production + Preview):
+
+| Variable | Example / notes |
+|----------|-----------------|
+| `DATABASE_URL` | Neon Postgres URL. This app uses Prisma schema **`mncc`** (won’t drop other tables). |
+| `ADMIN_PASSWORD` | Change from demo `mncc-admin-demo` |
+| `AUTH_SECRET` | Long random string |
+| `BLOB_READ_WRITE_TOKEN` | Optional — Vercel Blob for uploads |
+
+5. Deploy. Then from a machine with the same `DATABASE_URL`:
+   ```bash
+   npx prisma db push
+   npm run seed
+   ```
+6. Demo dossier path: `/artists/demo-contortion-trio`  
+   Admin: `/admin/login` with your `ADMIN_PASSWORD`.
+
+### Branding
+
+Official circular cyan/red/blue **New Circus** logo: `public/logo.png` (HD: `public/logo-hd.png`). Do not substitute BLACK.png / mncc.jpg / N*.jpg as the brand mark.
+
 
 ## Contact
 
